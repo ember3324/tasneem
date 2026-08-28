@@ -68,6 +68,7 @@ export function CartItems({ items }: { items: CartRow[] }) {
           imageUrl={item.product.image_url}
           onIncrement={() => setQuantity(item.id, item.quantity + 1)}
           onDecrement={() => setQuantity(item.id, item.quantity - 1)}
+          onQuantityChange={(quantity) => setQuantity(item.id, quantity)}
           onRemove={() => remove(item.id)}
         />
       ))}
