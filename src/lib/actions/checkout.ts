@@ -6,6 +6,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { getCurrentProfile } from '@/lib/profile'
 import { isWithinServiceArea, type ServiceZone } from '@/lib/geo'
 import { appendOrderRow, ensureSheetHeader } from '@/lib/sheets'
+import { sendOrderNotification } from '@/lib/telegram'
 import { getLocale, t } from '@/lib/i18n/server'
 import type { Address, PaymentMethod, Product } from '@/lib/types'
 
@@ -125,6 +126,24 @@ export async function createOrder(
       .eq('id', order.id)
   } catch (err) {
     console.error('Failed to append order to Google Sheet', err)
+  }
+
+  // Independent failure domain from the Sheets write above — a Telegram
+  // outage shouldn't block the sheet sync, or vice versa.
+  try {
+    await sendOrderNotification({
+      orderNumber: order.order_number,
+      customerName: profile.full_name,
+      customerPhone: profile.phone,
+      lat: address.lat,
+      lng: address.lng,
+      itemsSummary,
+      totalAmount,
+      paymentMethod,
+      addressDetails: address.address_line,
+    })
+  } catch (err) {
+    console.error('Failed to send Telegram order notification', err)
   }
 
   if (paymentMethod === 'cash') {
