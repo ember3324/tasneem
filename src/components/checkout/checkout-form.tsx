@@ -17,7 +17,7 @@ export function CheckoutForm({ addressId, total }: { addressId: string; total: n
       <div>
         <span className="block text-sm font-medium text-neutral-700">{t('checkout.paymentMethod')}</span>
         <div className="mt-2 space-y-2">
-          <label className="flex items-center gap-2 rounded-lg border border-neutral-300 px-3 py-2 text-sm has-[:checked]:border-neutral-900">
+          <label className="flex items-center gap-2 rounded-lg border border-neutral-300 px-3 py-2 text-sm has-[:checked]:border-ocean-500 has-[:checked]:bg-ocean-50">
             <input
               type="radio"
               checked={paymentMethod === 'card'}
@@ -25,7 +25,7 @@ export function CheckoutForm({ addressId, total }: { addressId: string; total: n
             />
             {t('checkout.payOnline')}
           </label>
-          <label className="flex items-center gap-2 rounded-lg border border-neutral-300 px-3 py-2 text-sm has-[:checked]:border-neutral-900">
+          <label className="flex items-center gap-2 rounded-lg border border-neutral-300 px-3 py-2 text-sm has-[:checked]:border-ocean-500 has-[:checked]:bg-ocean-50">
             <input
               type="radio"
               checked={paymentMethod === 'cash'}
@@ -41,7 +41,7 @@ export function CheckoutForm({ addressId, total }: { addressId: string; total: n
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-lg bg-neutral-900 py-2.5 text-sm font-medium text-white disabled:opacity-50"
+        className="w-full rounded-lg border border-ocean-400 bg-white py-2.5 text-sm font-semibold text-ocean-700 transition hover:border-ocean-500 hover:bg-ocean-50 disabled:opacity-50"
       >
         {pending ? (
           t('checkout.placingOrder')

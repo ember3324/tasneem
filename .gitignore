@@ -46,3 +46,6 @@ aquashop-506912-66a472e56d33.json
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# session handoff notes — working notes for resuming with Claude, not project docs
+HANDOFF.txt

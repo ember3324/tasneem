@@ -53,7 +53,7 @@ export default async function OrderDetailPage(props: PageProps<'/orders/[orderNu
             <li key={step} className="flex flex-1 flex-col items-center text-center">
               <div
                 className={`h-3 w-3 rounded-full ${
-                  i <= currentStepIndex ? 'bg-neutral-900' : 'bg-neutral-200'
+                  i <= currentStepIndex ? 'bg-ocean-500' : 'bg-neutral-200'
                 }`}
               />
               <span
@@ -68,7 +68,7 @@ export default async function OrderDetailPage(props: PageProps<'/orders/[orderNu
         </ol>
       )}
 
-      <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+      <div className="mt-8 rounded-xl border-2 border-ocean-300 bg-white p-6 shadow-sm">
         <h2 className="text-sm font-medium text-neutral-700">{t(locale, 'orders.items')}</h2>
         <ul className="mt-2 space-y-1 text-sm text-neutral-600">
           {(items ?? []).map((item) => (

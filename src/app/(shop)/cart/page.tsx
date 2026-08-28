@@ -40,7 +40,7 @@ export default async function CartPage() {
           .
         </p>
       ) : (
-        <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-4 shadow-sm">
+        <div className="mt-6 rounded-xl border-2 border-ocean-300 bg-white p-4 shadow-sm">
           {cartItems.map((item) => (
             <CartLineItem
               key={item.id}
@@ -62,7 +62,7 @@ export default async function CartPage() {
 
           <Link
             href="/checkout/address"
-            className="mt-4 block w-full rounded-lg bg-neutral-900 py-2.5 text-center text-sm font-medium text-white"
+            className="mt-4 block w-full rounded-lg border border-ocean-400 bg-white py-2.5 text-center text-sm font-semibold text-ocean-700 transition hover:border-ocean-500 hover:bg-ocean-50"
           >
             {t(locale, 'cart.checkout')}
           </Link>

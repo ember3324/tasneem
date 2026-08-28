@@ -84,7 +84,7 @@ export function LocationPicker({
           type="button"
           onClick={useMyLocation}
           disabled={locating}
-          className="rounded-lg border border-neutral-300 px-3 py-1.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-50"
+          className="rounded-lg border border-ocean-300 px-3 py-1.5 text-sm font-medium text-ocean-700 hover:bg-ocean-50 disabled:opacity-50"
         >
           {locating ? t('address.locating') : t('address.useMyLocation')}
         </button>

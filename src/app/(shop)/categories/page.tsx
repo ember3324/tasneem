@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getLocale, t } from '@/lib/i18n/server'
+import { translateCategoryName } from '@/lib/i18n/translations'
 import type { Category } from '@/lib/types'
 
 export default async function CategoriesPage() {
@@ -17,14 +18,16 @@ export default async function CategoriesPage() {
     <div>
       <h1 className="text-2xl font-semibold text-neutral-900">{t(locale, 'shop.byCategory')}</h1>
 
-      <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
+      <div className="mt-6 grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
         {(categories ?? []).map((category) => (
           <Link
             key={category.id}
             href={`/categories/${category.slug}`}
-            className="flex aspect-square flex-col items-center justify-center rounded-xl border border-neutral-200 bg-white p-4 text-center shadow-sm transition hover:border-neutral-400"
+            className="flex aspect-square flex-col items-center justify-center rounded-lg border border-ocean-200 bg-white p-2.5 text-center shadow-sm transition hover:border-ocean-400 hover:bg-ocean-50"
           >
-            <span className="font-medium text-neutral-900">{category.name}</span>
+            <span className="text-xs font-medium text-neutral-900 sm:text-sm">
+              {translateCategoryName(locale, category)}
+            </span>
           </Link>
         ))}
       </div>

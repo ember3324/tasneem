@@ -22,7 +22,7 @@ export default async function ProductPage(props: PageProps<'/products/[slug]'>) 
   const locale = await getLocale()
 
   return (
-    <div className="mx-auto max-w-lg overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm">
+    <div className="mx-auto max-w-lg overflow-hidden rounded-xl border-2 border-ocean-300 bg-white shadow-sm">
       {product.image_url && (
         <div className="relative aspect-square w-full bg-neutral-100">
           <Image
@@ -30,7 +30,7 @@ export default async function ProductPage(props: PageProps<'/products/[slug]'>) 
             alt={product.name}
             fill
             sizes="(max-width: 640px) 100vw, 512px"
-            className="object-cover"
+            className="object-contain"
             priority
           />
         </div>

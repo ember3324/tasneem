@@ -27,7 +27,7 @@ export function CartLineItem({
     <div className="flex flex-wrap items-center justify-between gap-4 border-b border-neutral-100 py-4 last:border-0">
       <div className="flex min-w-0 items-center gap-3">
         <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-neutral-100">
-          {imageUrl && <Image src={imageUrl} alt={name} fill sizes="56px" className="object-cover" />}
+          {imageUrl && <Image src={imageUrl} alt={name} fill sizes="56px" className="object-contain" />}
         </div>
         <div className="min-w-0">
           <p className="truncate font-medium text-neutral-900">{name}</p>

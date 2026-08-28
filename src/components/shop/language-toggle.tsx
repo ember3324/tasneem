@@ -13,7 +13,7 @@ export function LanguageToggle() {
       type="button"
       disabled={isPending}
       onClick={() => startTransition(() => setLocale(locale === 'en' ? 'ar' : 'en'))}
-      className="rounded-lg border border-neutral-300 px-2.5 py-1 text-xs font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-50"
+      className="rounded-lg border border-ocean-300 px-2.5 py-1 text-xs font-medium text-ocean-700 hover:bg-ocean-50 disabled:opacity-50"
     >
       {t('lang.toggle')}
     </button>

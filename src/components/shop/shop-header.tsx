@@ -19,38 +19,56 @@ export function ShopHeader({
   const cartLabel = cartCount > 0 ? `${t('nav.cart')} (${cartCount})` : t('nav.cart')
 
   return (
-    <header className="border-b border-neutral-200 bg-white">
+    <header className="sticky top-0 z-10 border-b border-ocean-200 bg-white/85 backdrop-blur-md">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
-        <Link href="/categories" className="text-lg font-semibold text-neutral-900">
+        <Link href="/categories" className="text-lg font-semibold text-ocean-700">
           AquaShop
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden items-center gap-5 text-sm font-medium text-neutral-600 sm:flex">
-          <Link href="/categories" className="hover:text-neutral-900">
+        <nav className="hidden items-center gap-2 text-sm font-medium text-neutral-600 sm:flex">
+          <Link
+            href="/categories"
+            className="rounded-lg border border-ocean-200 px-3 py-1.5 hover:border-ocean-400 hover:bg-ocean-50 hover:text-ocean-600"
+          >
             {t('nav.shop')}
           </Link>
           {loggedIn && (
-            <Link href="/orders" className="hover:text-neutral-900">
+            <Link
+              href="/orders"
+              className="rounded-lg border border-ocean-200 px-3 py-1.5 hover:border-ocean-400 hover:bg-ocean-50 hover:text-ocean-600"
+            >
               {t('nav.orders')}
             </Link>
           )}
-          <Link href="/cart" className="hover:text-neutral-900">
+          <Link
+            href="/cart"
+            className="rounded-lg border border-ocean-200 px-3 py-1.5 hover:border-ocean-400 hover:bg-ocean-50 hover:text-ocean-600"
+          >
             {cartLabel}
           </Link>
           {loggedIn ? (
             <>
-              <Link href="/account" className="hover:text-neutral-900">
+              <Link
+                href="/account"
+                className="rounded-lg border border-ocean-200 px-3 py-1.5 hover:border-ocean-400 hover:bg-ocean-50 hover:text-ocean-600"
+              >
                 {t('nav.account')}
               </Link>
               <form action={signOut}>
-                <button type="submit" className="hover:text-neutral-900">
+                <button
+                  type="submit"
+                  className="rounded-lg border border-ocean-200 px-3 py-1.5 hover:border-ocean-400 hover:bg-ocean-50 hover:text-ocean-600"
+                >
                   {t('nav.logout')}
                 </button>
               </form>
             </>
           ) : (
-            <Link href="/login" className="hover:text-neutral-900">
+            <Link
+              href="/login"
+              className="rounded-lg border border-ocean-200 px-3 py-1.5 hover:border-ocean-400 hover:bg-ocean-50 hover:text-ocean-600"
+            >
               {t('nav.login')}
             </Link>
           )}
@@ -64,7 +82,7 @@ export function ShopHeader({
             type="button"
             aria-label="Menu"
             onClick={() => setMenuOpen((v) => !v)}
-            className="flex h-9 w-9 items-center justify-center rounded-lg border border-neutral-300"
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-ocean-300 hover:bg-ocean-50"
           >
             <svg
               width="18"
@@ -87,32 +105,55 @@ export function ShopHeader({
 
       {/* Mobile dropdown menu */}
       {menuOpen && (
-        <nav className="border-t border-neutral-200 bg-white px-4 py-3 text-sm font-medium text-neutral-700 sm:hidden">
-          <div className="flex flex-col gap-1">
-            <Link href="/categories" className="rounded-lg px-2 py-2 hover:bg-neutral-50" onClick={() => setMenuOpen(false)}>
+        <nav className="border-t border-ocean-200 bg-white/95 backdrop-blur-md px-4 py-3 text-sm font-medium text-neutral-700 sm:hidden">
+          <div className="flex flex-col gap-1.5">
+            <Link
+              href="/categories"
+              className="rounded-lg border border-ocean-200 px-2 py-2 hover:bg-ocean-50"
+              onClick={() => setMenuOpen(false)}
+            >
               {t('nav.shop')}
             </Link>
             {loggedIn && (
-              <Link href="/orders" className="rounded-lg px-2 py-2 hover:bg-neutral-50" onClick={() => setMenuOpen(false)}>
+              <Link
+                href="/orders"
+                className="rounded-lg border border-ocean-200 px-2 py-2 hover:bg-ocean-50"
+                onClick={() => setMenuOpen(false)}
+              >
                 {t('nav.orders')}
               </Link>
             )}
-            <Link href="/cart" className="rounded-lg px-2 py-2 hover:bg-neutral-50" onClick={() => setMenuOpen(false)}>
+            <Link
+              href="/cart"
+              className="rounded-lg border border-ocean-200 px-2 py-2 hover:bg-ocean-50"
+              onClick={() => setMenuOpen(false)}
+            >
               {cartLabel}
             </Link>
             {loggedIn ? (
               <>
-                <Link href="/account" className="rounded-lg px-2 py-2 hover:bg-neutral-50" onClick={() => setMenuOpen(false)}>
+                <Link
+                  href="/account"
+                  className="rounded-lg border border-ocean-200 px-2 py-2 hover:bg-ocean-50"
+                  onClick={() => setMenuOpen(false)}
+                >
                   {t('nav.account')}
                 </Link>
                 <form action={signOut}>
-                  <button type="submit" className="w-full rounded-lg px-2 py-2 text-left hover:bg-neutral-50 rtl:text-right">
+                  <button
+                    type="submit"
+                    className="w-full rounded-lg border border-ocean-200 px-2 py-2 text-left hover:bg-ocean-50 rtl:text-right"
+                  >
                     {t('nav.logout')}
                   </button>
                 </form>
               </>
             ) : (
-              <Link href="/login" className="rounded-lg px-2 py-2 hover:bg-neutral-50" onClick={() => setMenuOpen(false)}>
+              <Link
+                href="/login"
+                className="rounded-lg border border-ocean-200 px-2 py-2 hover:bg-ocean-50"
+                onClick={() => setMenuOpen(false)}
+              >
                 {t('nav.login')}
               </Link>
             )}

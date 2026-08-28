@@ -41,6 +41,7 @@ export const translations = {
   'auth.error.couldNotCreate': { en: 'Could not create account.', ar: 'تعذّر إنشاء الحساب.' },
 
   'shop.byCategory': { en: 'Shop by category', ar: 'تسوّق حسب الفئة' },
+  'shop.backToCategories': { en: 'Back', ar: 'رجوع' },
   'shop.noCategories': { en: 'No categories yet.', ar: 'لا توجد فئات بعد.' },
   'shop.noProducts': { en: 'No products in this category yet.', ar: 'لا توجد منتجات في هذه الفئة بعد.' },
   'shop.outOfStock': { en: 'Out of stock', ar: 'غير متوفر' },
@@ -144,10 +145,23 @@ export const translations = {
   'account.outsideArea': { en: 'Outside delivery area', ar: 'خارج نطاق التوصيل' },
 
   'lang.toggle': { en: 'العربية', ar: 'English' },
+  'whatsapp.chat': { en: 'Chat on WhatsApp', ar: 'تواصل عبر واتساب' },
 } as const
 
 export type TranslationKey = keyof typeof translations
 
 export function translate(locale: Locale, key: TranslationKey): string {
   return translations[key][locale]
+}
+
+// Category names live in the DB (no name_ar column), so translate the seed
+// categories by slug here and fall back to the DB name for anything unknown.
+const categoryTranslations: Record<string, { en: string; ar: string }> = {
+  'water-bottles': { en: 'Water Bottles', ar: 'زجاجات المياه' },
+  dispensers: { en: 'Dispensers', ar: 'موزعات المياه' },
+  accessories: { en: 'Accessories', ar: 'الإكسسوارات' },
+}
+
+export function translateCategoryName(locale: Locale, category: { slug: string; name: string }): string {
+  return categoryTranslations[category.slug]?.[locale] ?? category.name
 }

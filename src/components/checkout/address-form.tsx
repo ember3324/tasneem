@@ -72,7 +72,7 @@ export function AddressForm() {
       <button
         type="submit"
         disabled={pending || !coords}
-        className="w-full rounded-lg bg-neutral-900 py-2.5 text-sm font-medium text-white disabled:opacity-50"
+        className="w-full rounded-lg border border-ocean-400 bg-white py-2.5 text-sm font-semibold text-ocean-700 transition hover:border-ocean-500 hover:bg-ocean-50 disabled:opacity-50"
       >
         {pending ? t('address.checking') : t('address.continue')}
       </button>

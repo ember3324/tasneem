@@ -1,6 +1,7 @@
 'use server'
 
 import { redirect } from 'next/navigation'
+import { revalidatePath } from 'next/cache'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getCurrentProfile } from '@/lib/profile'
 import { isWithinServiceArea, type ServiceZone } from '@/lib/geo'
@@ -62,4 +63,17 @@ export async function saveAddressAndCheckServiceArea(
   }
 
   redirect(`/checkout?address=${address.id}`)
+}
+
+// Scoped to user_id since the service-role admin client bypasses RLS — see
+// the note in lib/actions/cart.ts for why this check is required here.
+// Addresses referenced by a past order are protected by a FK constraint, so
+// the delete is a no-op for those rather than throwing.
+export async function deleteAddress(addressId: string) {
+  const profile = await getCurrentProfile()
+  if (!profile) return
+
+  const admin = createAdminClient()
+  await admin.from('addresses').delete().eq('id', addressId).eq('user_id', profile.id)
+  revalidatePath('/account')
 }
