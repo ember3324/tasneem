@@ -62,6 +62,9 @@ export const translations = {
     en: "We need this to confirm you're within our delivery area.",
     ar: 'نحتاج هذا للتأكد من أنك داخل نطاق التوصيل لدينا.',
   },
+  'address.chooseAddress': { en: 'Choose a delivery address', ar: 'اختر عنوان التوصيل' },
+  'address.deliverHere': { en: 'Deliver here', ar: 'التوصيل هنا' },
+  'address.addNew': { en: 'Add a new address', ar: 'أضف عنوانًا جديدًا' },
   'address.useMyLocation': { en: '📍 Use my current location', ar: '📍 استخدم موقعي الحالي' },
   'address.locating': { en: 'Locating…', ar: 'جارٍ تحديد الموقع…' },
   'address.dragPinHint': {
