@@ -10,14 +10,10 @@ export default async function AccountPage() {
   if (!profile) redirect('/login?next=/account')
 
   const admin = createAdminClient()
-  const { data: addresses } = await admin
-    .from('addresses')
-    .select('*')
-    .eq('user_id', profile.id)
-    .order('created_at', { ascending: false })
-    .returns<Address[]>()
-
-  const locale = await getLocale()
+  const [{ data: addresses }, locale] = await Promise.all([
+    admin.from('addresses').select('*').eq('user_id', profile.id).order('created_at', { ascending: false }).returns<Address[]>(),
+    getLocale(),
+  ])
 
   return (
     <div className="mx-auto max-w-lg space-y-8">

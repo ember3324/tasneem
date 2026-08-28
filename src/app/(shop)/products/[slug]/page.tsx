@@ -11,16 +11,13 @@ export default async function ProductPage(props: PageProps<'/products/[slug]'>) 
   const { slug } = await props.params
   const admin = createAdminClient()
 
-  const { data: product } = await admin
-    .from('products')
-    .select('*')
-    .eq('slug', slug)
-    .maybeSingle<Product>()
+  const [{ data: product }, profile, locale] = await Promise.all([
+    admin.from('products').select('*').eq('slug', slug).maybeSingle<Product>(),
+    getCurrentProfile(),
+    getLocale(),
+  ])
 
   if (!product) notFound()
-
-  const profile = await getCurrentProfile()
-  const locale = await getLocale()
 
   return (
     <div className="mx-auto max-w-lg overflow-hidden rounded-xl border-2 border-ocean-300 bg-white shadow-sm">

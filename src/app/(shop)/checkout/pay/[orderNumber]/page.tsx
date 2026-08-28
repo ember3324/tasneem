@@ -11,12 +11,10 @@ export default async function CheckoutPayPage(props: PageProps<'/checkout/pay/[o
   if (!profile) redirect(`/login?next=/checkout/pay/${orderNumber}`)
 
   const admin = createAdminClient()
-  const { data: order } = await admin
-    .from('orders')
-    .select('*')
-    .eq('order_number', orderNumber)
-    .eq('user_id', profile.id)
-    .maybeSingle<Order>()
+  const [{ data: order }, locale] = await Promise.all([
+    admin.from('orders').select('*').eq('order_number', orderNumber).eq('user_id', profile.id).maybeSingle<Order>(),
+    getLocale(),
+  ])
 
   if (!order) notFound()
   if (order.payment_method !== 'card') redirect(`/orders/${orderNumber}`)
@@ -30,8 +28,6 @@ export default async function CheckoutPayPage(props: PageProps<'/checkout/pay/[o
       </p>
     )
   }
-
-  const locale = await getLocale()
 
   return (
     <div className="mx-auto max-w-md">

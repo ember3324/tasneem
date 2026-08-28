@@ -6,13 +6,10 @@ import type { Category } from '@/lib/types'
 
 export default async function CategoriesPage() {
   const admin = createAdminClient()
-  const { data: categories } = await admin
-    .from('categories')
-    .select('*')
-    .order('sort_order')
-    .returns<Category[]>()
-
-  const locale = await getLocale()
+  const [{ data: categories }, locale] = await Promise.all([
+    admin.from('categories').select('*').order('sort_order').returns<Category[]>(),
+    getLocale(),
+  ])
 
   return (
     <div>

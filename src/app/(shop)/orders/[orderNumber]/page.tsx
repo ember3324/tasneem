@@ -13,6 +13,8 @@ export default async function OrderDetailPage(props: PageProps<'/orders/[orderNu
   if (!profile) redirect(`/login?next=/orders/${orderNumber}`)
 
   const admin = createAdminClient()
+  const localePromise = getLocale()
+
   const { data: order } = await admin
     .from('orders')
     .select('*')
@@ -22,13 +24,10 @@ export default async function OrderDetailPage(props: PageProps<'/orders/[orderNu
 
   if (!order) notFound()
 
-  const { data: items } = await admin
-    .from('order_items')
-    .select('*')
-    .eq('order_id', order.id)
-    .returns<OrderItem[]>()
-
-  const locale = await getLocale()
+  const [{ data: items }, locale] = await Promise.all([
+    admin.from('order_items').select('*').eq('order_id', order.id).returns<OrderItem[]>(),
+    localePromise,
+  ])
   const currentStepIndex = STATUS_ORDER.indexOf(order.status)
 
   return (

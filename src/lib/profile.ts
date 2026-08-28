@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getSessionProfileId } from '@/lib/session'
 
@@ -13,8 +14,12 @@ export type CurrentProfile = {
  * Auth session involved (see src/lib/session.ts) — this reads the signed
  * session cookie and looks the profile up with the service-role client,
  * since RLS's auth.uid()-based policies don't apply to these sessions.
+ *
+ * Wrapped in React's cache() because every shop page calls this in addition
+ * to the (shop) layout — without memoization that's the same profile query
+ * running twice (or more) per request.
  */
-export async function getCurrentProfile(): Promise<CurrentProfile | null> {
+export const getCurrentProfile = cache(async (): Promise<CurrentProfile | null> => {
   const profileId = await getSessionProfileId()
   if (!profileId) return null
 
@@ -26,4 +31,4 @@ export async function getCurrentProfile(): Promise<CurrentProfile | null> {
     .maybeSingle<CurrentProfile>()
 
   return data ?? null
-}
+})

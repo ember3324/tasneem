@@ -12,6 +12,11 @@ export default async function CategoryPage(props: PageProps<'/categories/[slug]'
   const { slug } = await props.params
   const admin = createAdminClient()
 
+  // profile/locale don't depend on the category lookup, so kick them off
+  // now instead of waiting until after it resolves.
+  const profilePromise = getCurrentProfile()
+  const localePromise = getLocale()
+
   const { data: category } = await admin
     .from('categories')
     .select('*')
@@ -20,15 +25,11 @@ export default async function CategoryPage(props: PageProps<'/categories/[slug]'
 
   if (!category) notFound()
 
-  const { data: products } = await admin
-    .from('products')
-    .select('*')
-    .eq('category_id', category.id)
-    .order('sort_order')
-    .returns<Product[]>()
-
-  const profile = await getCurrentProfile()
-  const locale = await getLocale()
+  const [{ data: products }, profile, locale] = await Promise.all([
+    admin.from('products').select('*').eq('category_id', category.id).order('sort_order').returns<Product[]>(),
+    profilePromise,
+    localePromise,
+  ])
 
   return (
     <div>

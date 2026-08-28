@@ -16,13 +16,10 @@ export default async function CartPage() {
   if (!profile) redirect('/login?next=/cart')
 
   const admin = createAdminClient()
-  const { data: items } = await admin
-    .from('cart_items')
-    .select('id, quantity, product:products(*)')
-    .eq('user_id', profile.id)
-    .returns<CartRow[]>()
-
-  const locale = await getLocale()
+  const [{ data: items }, locale] = await Promise.all([
+    admin.from('cart_items').select('id, quantity, product:products(*)').eq('user_id', profile.id).returns<CartRow[]>(),
+    getLocale(),
+  ])
 
   return (
     <div className="mx-auto max-w-2xl">

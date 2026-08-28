@@ -11,14 +11,10 @@ export default async function OrdersPage() {
   if (!profile) redirect('/login?next=/orders')
 
   const admin = createAdminClient()
-  const { data: orders } = await admin
-    .from('orders')
-    .select('*')
-    .eq('user_id', profile.id)
-    .order('created_at', { ascending: false })
-    .returns<Order[]>()
-
-  const locale = await getLocale()
+  const [{ data: orders }, locale] = await Promise.all([
+    admin.from('orders').select('*').eq('user_id', profile.id).order('created_at', { ascending: false }).returns<Order[]>(),
+    getLocale(),
+  ])
   const all = orders ?? []
   const current = all.filter((o) => o.status !== 'completed' && o.status !== 'cancelled')
   const past = all.filter((o) => o.status === 'completed' || o.status === 'cancelled')

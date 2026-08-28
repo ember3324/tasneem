@@ -5,7 +5,7 @@ import { ShopHeader } from '@/components/shop/shop-header'
 import { WhatsAppButton } from '@/components/shop/whatsapp-button'
 
 export default async function ShopLayout({ children }: { children: React.ReactNode }) {
-  const profile = await getCurrentProfile()
+  const [profile, locale] = await Promise.all([getCurrentProfile(), getLocale()])
 
   let cartCount = 0
   if (profile) {
@@ -13,8 +13,6 @@ export default async function ShopLayout({ children }: { children: React.ReactNo
     const { data } = await admin.from('cart_items').select('quantity').eq('user_id', profile.id)
     cartCount = (data ?? []).reduce((sum, item) => sum + item.quantity, 0)
   }
-
-  const locale = await getLocale()
 
   return (
     <div className="min-h-screen">

@@ -15,26 +15,20 @@ export default async function CheckoutPage(props: PageProps<'/checkout'>) {
   if (!addressId) redirect('/checkout/address')
 
   const admin = createAdminClient()
-  const { data: address } = await admin
-    .from('addresses')
-    .select('*')
-    .eq('id', addressId)
-    .eq('user_id', profile.id)
-    .maybeSingle<Address>()
+  type CartRow = { id: string; quantity: number; product: Product }
+
+  // address and cartItems both only depend on profile.id, not on each
+  // other — fetch them together instead of one after the other.
+  const [{ data: address }, { data: cartItems }, locale] = await Promise.all([
+    admin.from('addresses').select('*').eq('id', addressId).eq('user_id', profile.id).maybeSingle<Address>(),
+    admin.from('cart_items').select('id, quantity, product:products(*)').eq('user_id', profile.id).returns<CartRow[]>(),
+    getLocale(),
+  ])
 
   if (!address || !address.in_service_area) redirect('/checkout/address')
-
-  type CartRow = { id: string; quantity: number; product: Product }
-  const { data: cartItems } = await admin
-    .from('cart_items')
-    .select('id, quantity, product:products(*)')
-    .eq('user_id', profile.id)
-    .returns<CartRow[]>()
-
   if (!cartItems || cartItems.length === 0) redirect('/cart')
 
   const total = cartItems.reduce((sum, i) => sum + i.product.price * i.quantity, 0)
-  const locale = await getLocale()
 
   return (
     <div className="mx-auto max-w-lg">
