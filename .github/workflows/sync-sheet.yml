@@ -1,0 +1,23 @@
+name: Sync Google Sheet order updates
+
+# Vercel's free Hobby plan only allows cron jobs that run once a day, which
+# is too slow for admin edits (status, proof photo) to feel real-time. This
+# workflow calls the same endpoint from GitHub Actions instead, which can
+# run every couple of minutes for free. See SETUP.md for details.
+#
+# Requires two repo secrets (Settings -> Secrets and variables -> Actions):
+#   SITE_URL    e.g. https://your-project.vercel.app
+#   CRON_SECRET must match the CRON_SECRET env var set in Vercel
+
+on:
+  schedule:
+    - cron: '*/2 * * * *'
+  workflow_dispatch: {}
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call sync-sheet endpoint
+        run: |
+          curl -fsS "${{ secrets.SITE_URL }}/api/cron/sync-sheet?secret=${{ secrets.CRON_SECRET }}"

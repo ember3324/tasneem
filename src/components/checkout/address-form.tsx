@@ -1,0 +1,84 @@
+'use client'
+
+import { useActionState, useState } from 'react'
+import Link from 'next/link'
+import { LocationPicker } from './location-picker'
+import { saveAddressAndCheckServiceArea } from '@/lib/actions/address'
+
+export function AddressForm() {
+  const [state, formAction, pending] = useActionState(saveAddressAndCheckServiceArea, null)
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null)
+
+  if (state && 'outsideServiceArea' in state) {
+    return (
+      <div className="rounded-xl border border-amber-200 bg-amber-50 p-6 text-center">
+        <h2 className="text-lg font-semibold text-amber-900">
+          Sorry, we don&apos;t deliver there yet
+        </h2>
+        <p className="mt-2 text-sm text-amber-800">
+          That location is outside our current delivery area. We&apos;re expanding regularly —
+          check back soon.
+        </p>
+        <Link href="/cart" className="mt-4 inline-block text-sm font-medium underline">
+          Back to cart
+        </Link>
+      </div>
+    )
+  }
+
+  return (
+    <form action={formAction} className="space-y-5">
+      <input type="hidden" name="lat" value={coords?.lat ?? ''} />
+      <input type="hidden" name="lng" value={coords?.lng ?? ''} />
+
+      <LocationPicker onChange={setCoords} />
+
+      <div>
+        <label htmlFor="label" className="block text-sm font-medium text-neutral-700">
+          Label
+        </label>
+        <input
+          id="label"
+          name="label"
+          type="text"
+          defaultValue="Home"
+          className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-neutral-500 focus:outline-none"
+        />
+      </div>
+
+      <div>
+        <label htmlFor="addressLine" className="block text-sm font-medium text-neutral-700">
+          Address details (building, street, apartment)
+        </label>
+        <input
+          id="addressLine"
+          name="addressLine"
+          type="text"
+          className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-neutral-500 focus:outline-none"
+        />
+      </div>
+
+      <div>
+        <label htmlFor="city" className="block text-sm font-medium text-neutral-700">
+          City
+        </label>
+        <input
+          id="city"
+          name="city"
+          type="text"
+          className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-neutral-500 focus:outline-none"
+        />
+      </div>
+
+      {state && 'error' in state && <p className="text-sm text-red-600">{state.error}</p>}
+
+      <button
+        type="submit"
+        disabled={pending || !coords}
+        className="w-full rounded-lg bg-neutral-900 py-2.5 text-sm font-medium text-white disabled:opacity-50"
+      >
+        {pending ? 'Checking…' : 'Continue to checkout'}
+      </button>
+    </form>
+  )
+}
