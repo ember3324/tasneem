@@ -72,11 +72,3 @@ export type OrderItem = {
   quantity: number
   line_total: number
 }
-
-export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
-  pending: 'Pending',
-  confirmed: 'Confirmed',
-  out_for_delivery: 'Out for Delivery',
-  completed: 'Completed',
-  cancelled: 'Cancelled',
-}

@@ -6,6 +6,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { getCurrentProfile } from '@/lib/profile'
 import { isWithinServiceArea, type ServiceZone } from '@/lib/geo'
 import { appendOrderRow, ensureSheetHeader } from '@/lib/sheets'
+import { getLocale, t } from '@/lib/i18n/server'
 import type { Address, PaymentMethod, Product } from '@/lib/types'
 
 function generateOrderNumber() {
@@ -16,16 +17,17 @@ export async function createOrder(
   _prevState: { error: string } | null | undefined,
   formData: FormData
 ): Promise<{ error: string } | undefined> {
+  const locale = await getLocale()
   const addressId = String(formData.get('addressId') ?? '')
   const paymentMethod = String(formData.get('paymentMethod') ?? '') as PaymentMethod
 
-  if (!addressId) return { error: 'Missing delivery address.' }
+  if (!addressId) return { error: t(locale, 'checkout.error.missingAddress') }
   if (paymentMethod !== 'cash' && paymentMethod !== 'card') {
-    return { error: 'Choose a payment method.' }
+    return { error: t(locale, 'checkout.error.choosePayment') }
   }
 
   const profile = await getCurrentProfile()
-  if (!profile) return { error: 'You must be logged in.' }
+  if (!profile) return { error: t(locale, 'checkout.error.mustBeLoggedIn') }
 
   const admin = createAdminClient()
 
@@ -35,7 +37,7 @@ export async function createOrder(
     .eq('id', addressId)
     .eq('user_id', profile.id)
     .maybeSingle<Address>()
-  if (!address) return { error: 'Address not found.' }
+  if (!address) return { error: t(locale, 'checkout.error.addressNotFound') }
 
   // Re-verify against current zones — the address may have been saved a
   // while ago, or zones may have changed since.
@@ -45,7 +47,7 @@ export async function createOrder(
     .eq('active', true)
     .returns<ServiceZone[]>()
   if (!isWithinServiceArea(address.lat, address.lng, zones ?? [])) {
-    return { error: 'This address is outside our delivery area.' }
+    return { error: t(locale, 'checkout.error.outsideArea') }
   }
 
   type CartRow = { id: string; quantity: number; product: Product }
@@ -56,7 +58,7 @@ export async function createOrder(
     .returns<CartRow[]>()
 
   if (!cartItems || cartItems.length === 0) {
-    return { error: 'Your cart is empty.' }
+    return { error: t(locale, 'checkout.error.emptyCart') }
   }
 
   const totalAmount = cartItems.reduce((sum, i) => sum + i.product.price * i.quantity, 0)
@@ -83,7 +85,7 @@ export async function createOrder(
     .single()
 
   if (orderError || !order) {
-    return { error: orderError?.message ?? 'Could not create order.' }
+    return { error: orderError?.message ?? t(locale, 'checkout.error.couldNotCreate') }
   }
 
   await admin.from('order_items').insert(

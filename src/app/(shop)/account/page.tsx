@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getCurrentProfile } from '@/lib/profile'
+import { getLocale, t } from '@/lib/i18n/server'
 import type { Address } from '@/lib/types'
 
 export default async function AccountPage() {
@@ -15,30 +16,30 @@ export default async function AccountPage() {
     .order('created_at', { ascending: false })
     .returns<Address[]>()
 
+  const locale = await getLocale()
+
   return (
     <div className="mx-auto max-w-lg space-y-8">
       <section>
-        <h1 className="text-2xl font-semibold text-neutral-900">Account</h1>
+        <h1 className="text-2xl font-semibold text-neutral-900">{t(locale, 'account.title')}</h1>
         <div className="mt-4 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
           <dl className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <dt className="text-neutral-500">Name</dt>
+              <dt className="text-neutral-500">{t(locale, 'account.name')}</dt>
               <dd className="font-medium text-neutral-900">{profile.full_name}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-neutral-500">Phone</dt>
-              <dd className="font-medium text-neutral-900">{profile.phone}</dd>
+              <dt className="text-neutral-500">{t(locale, 'account.phone')}</dt>
+              <dd dir="ltr" className="font-medium text-neutral-900">{profile.phone}</dd>
             </div>
           </dl>
         </div>
       </section>
 
       <section>
-        <h2 className="text-lg font-semibold text-neutral-900">Saved addresses</h2>
+        <h2 className="text-lg font-semibold text-neutral-900">{t(locale, 'account.savedAddresses')}</h2>
         {(!addresses || addresses.length === 0) ? (
-          <p className="mt-2 text-sm text-neutral-500">
-            No saved addresses yet — you&apos;ll add one at checkout.
-          </p>
+          <p className="mt-2 text-sm text-neutral-500">{t(locale, 'account.noAddresses')}</p>
         ) : (
           <div className="mt-4 space-y-3">
             {addresses.map((address) => (
@@ -52,7 +53,7 @@ export default async function AccountPage() {
                   {address.city ?? ''}
                 </p>
                 <p className="mt-1 text-xs text-neutral-400">
-                  {address.in_service_area ? 'Within delivery area' : 'Outside delivery area'}
+                  {address.in_service_area ? t(locale, 'account.withinArea') : t(locale, 'account.outsideArea')}
                 </p>
               </div>
             ))}

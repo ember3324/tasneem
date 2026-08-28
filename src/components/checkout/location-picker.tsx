@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
+import { useLocale } from '@/lib/i18n/client'
 
 // Default view centered on the Grand Mosque, Mecca — the only service area for now.
 const DEFAULT_CENTER: [number, number] = [39.8262, 21.4225]
@@ -17,6 +18,7 @@ export function LocationPicker({
   const markerRef = useRef<mapboxgl.Marker | null>(null)
   const [locating, setLocating] = useState(false)
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null)
+  const { t } = useLocale()
 
   useEffect(() => {
     mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? ''
@@ -84,18 +86,16 @@ export function LocationPicker({
           disabled={locating}
           className="rounded-lg border border-neutral-300 px-3 py-1.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-50"
         >
-          {locating ? 'Locating…' : '📍 Use my current location'}
+          {locating ? t('address.locating') : t('address.useMyLocation')}
         </button>
         {coords && (
-          <span className="text-xs text-neutral-500">
+          <span dir="ltr" className="text-xs text-neutral-500">
             {coords.lat.toFixed(5)}, {coords.lng.toFixed(5)}
           </span>
         )}
       </div>
       <div ref={mapContainer} className="h-80 w-full rounded-lg border border-neutral-200" />
-      <p className="mt-2 text-xs text-neutral-500">
-        Drag the pin or tap the map to set your exact delivery location.
-      </p>
+      <p className="mt-2 text-xs text-neutral-500">{t('address.dragPinHint')}</p>
     </div>
   )
 }

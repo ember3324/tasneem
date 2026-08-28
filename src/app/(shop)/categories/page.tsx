@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { getLocale, t } from '@/lib/i18n/server'
 import type { Category } from '@/lib/types'
 
 export default async function CategoriesPage() {
@@ -10,9 +11,11 @@ export default async function CategoriesPage() {
     .order('sort_order')
     .returns<Category[]>()
 
+  const locale = await getLocale()
+
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-neutral-900">Shop by category</h1>
+      <h1 className="text-2xl font-semibold text-neutral-900">{t(locale, 'shop.byCategory')}</h1>
 
       <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
         {(categories ?? []).map((category) => (
@@ -27,7 +30,7 @@ export default async function CategoriesPage() {
       </div>
 
       {(!categories || categories.length === 0) && (
-        <p className="mt-6 text-sm text-neutral-500">No categories yet.</p>
+        <p className="mt-6 text-sm text-neutral-500">{t(locale, 'shop.noCategories')}</p>
       )}
     </div>
   )

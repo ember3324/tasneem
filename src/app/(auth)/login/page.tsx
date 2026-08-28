@@ -4,22 +4,24 @@ import { Suspense, useActionState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { signUpOrLogIn } from '@/lib/actions/auth'
+import { useLocale } from '@/lib/i18n/client'
 
 function LoginForm() {
   const next = useSearchParams().get('next') ?? '/'
   const [state, formAction, pending] = useActionState(signUpOrLogIn, null)
+  const { t } = useLocale()
 
   return (
     <div>
-      <h1 className="text-xl font-semibold text-neutral-900">Log in</h1>
-      <p className="mt-1 text-sm text-neutral-500">Enter your mobile number.</p>
+      <h1 className="text-xl font-semibold text-neutral-900">{t('auth.login.title')}</h1>
+      <p className="mt-1 text-sm text-neutral-500">{t('auth.login.subtitle')}</p>
 
       <form action={formAction} className="mt-6 space-y-4">
         <input type="hidden" name="next" value={next} />
 
         <div>
           <label htmlFor="phone" className="block text-sm font-medium text-neutral-700">
-            Mobile number
+            {t('auth.mobileNumber')}
           </label>
           <input
             id="phone"
@@ -39,14 +41,14 @@ function LoginForm() {
           disabled={pending}
           className="w-full rounded-lg bg-neutral-900 py-2.5 text-sm font-medium text-white disabled:opacity-50"
         >
-          {pending ? 'Logging in…' : 'Log in'}
+          {pending ? t('auth.login.submitting') : t('auth.login.submit')}
         </button>
       </form>
 
       <p className="mt-6 text-center text-sm text-neutral-500">
-        New here?{' '}
+        {t('auth.login.newHere')}{' '}
         <Link href="/signup" className="font-medium text-neutral-900 underline">
-          Create an account
+          {t('auth.login.createAccount')}
         </Link>
       </p>
     </div>

@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createSessionCookie, destroySessionCookie } from '@/lib/session'
 import { normalizeSaudiPhone } from '@/lib/phone'
+import { getLocale, t } from '@/lib/i18n/server'
 
 export type ActionResult = { error: string } | { success: true }
 
@@ -16,13 +17,14 @@ export async function signUpOrLogIn(
   _prevState: ActionResult | null | undefined,
   formData: FormData
 ): Promise<ActionResult> {
+  const locale = await getLocale()
   const phoneRaw = String(formData.get('phone') ?? '')
   const fullName = String(formData.get('fullName') ?? '').trim()
   const next = String(formData.get('next') ?? '/')
 
   const phone = normalizeSaudiPhone(phoneRaw)
   if (!phone) {
-    return { error: 'Enter a valid Saudi mobile number, e.g. 05XXXXXXXX.' }
+    return { error: t(locale, 'auth.error.invalidPhone') }
   }
 
   const admin = createAdminClient()
@@ -37,7 +39,7 @@ export async function signUpOrLogIn(
 
   if (!profileId) {
     if (!fullName) {
-      return { error: "We don't recognize that number — enter your name to create an account." }
+      return { error: t(locale, 'auth.error.unrecognizedNumber') }
     }
 
     const { data: created, error } = await admin
@@ -46,7 +48,7 @@ export async function signUpOrLogIn(
       .select('id')
       .single()
 
-    if (error || !created) return { error: error?.message ?? 'Could not create account.' }
+    if (error || !created) return { error: error?.message ?? t(locale, 'auth.error.couldNotCreate') }
     profileId = created.id
   }
 

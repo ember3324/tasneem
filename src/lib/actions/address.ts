@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getCurrentProfile } from '@/lib/profile'
 import { isWithinServiceArea, type ServiceZone } from '@/lib/geo'
+import { getLocale, t } from '@/lib/i18n/server'
 
 export type AddressActionResult =
   | { error: string }
@@ -14,17 +15,19 @@ export async function saveAddressAndCheckServiceArea(
   _prevState: AddressActionResult | null,
   formData: FormData
 ): Promise<AddressActionResult> {
+  const locale = await getLocale()
   const profile = await getCurrentProfile()
-  if (!profile) return { error: 'You must be logged in.' }
+  if (!profile) return { error: t(locale, 'address.error.mustBeLoggedIn') }
 
   const lat = parseFloat(String(formData.get('lat') ?? ''))
   const lng = parseFloat(String(formData.get('lng') ?? ''))
-  const label = String(formData.get('label') ?? 'Home').trim() || 'Home'
+  const defaultLabel = t(locale, 'address.labelPlaceholder')
+  const label = String(formData.get('label') ?? defaultLabel).trim() || defaultLabel
   const addressLine = String(formData.get('addressLine') ?? '').trim()
   const city = String(formData.get('city') ?? '').trim()
 
   if (Number.isNaN(lat) || Number.isNaN(lng)) {
-    return { error: 'Please share or select your location on the map.' }
+    return { error: t(locale, 'address.error.needLocation') }
   }
 
   const admin = createAdminClient()
@@ -51,7 +54,7 @@ export async function saveAddressAndCheckServiceArea(
     .single()
 
   if (error || !address) {
-    return { error: error?.message ?? 'Could not save address.' }
+    return { error: error?.message ?? t(locale, 'address.error.couldNotSave') }
   }
 
   if (!inServiceArea) {

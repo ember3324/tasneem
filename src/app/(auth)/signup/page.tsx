@@ -4,22 +4,24 @@ import { Suspense, useActionState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { signUpOrLogIn } from '@/lib/actions/auth'
+import { useLocale } from '@/lib/i18n/client'
 
 function SignupForm() {
   const next = useSearchParams().get('next') ?? '/'
   const [state, formAction, pending] = useActionState(signUpOrLogIn, null)
+  const { t } = useLocale()
 
   return (
     <div>
-      <h1 className="text-xl font-semibold text-neutral-900">Create your account</h1>
-      <p className="mt-1 text-sm text-neutral-500">Just your name and number — no password.</p>
+      <h1 className="text-xl font-semibold text-neutral-900">{t('auth.signup.title')}</h1>
+      <p className="mt-1 text-sm text-neutral-500">{t('auth.signup.subtitle')}</p>
 
       <form action={formAction} className="mt-6 space-y-4">
         <input type="hidden" name="next" value={next} />
 
         <div>
           <label htmlFor="fullName" className="block text-sm font-medium text-neutral-700">
-            Full name
+            {t('auth.fullName')}
           </label>
           <input
             id="fullName"
@@ -33,7 +35,7 @@ function SignupForm() {
 
         <div>
           <label htmlFor="phone" className="block text-sm font-medium text-neutral-700">
-            Mobile number
+            {t('auth.mobileNumber')}
           </label>
           <input
             id="phone"
@@ -53,14 +55,14 @@ function SignupForm() {
           disabled={pending}
           className="w-full rounded-lg bg-neutral-900 py-2.5 text-sm font-medium text-white disabled:opacity-50"
         >
-          {pending ? 'Creating account…' : 'Create account'}
+          {pending ? t('auth.signup.submitting') : t('auth.signup.submit')}
         </button>
       </form>
 
       <p className="mt-6 text-center text-sm text-neutral-500">
-        Already have an account?{' '}
+        {t('auth.signup.haveAccount')}{' '}
         <Link href="/login" className="font-medium text-neutral-900 underline">
-          Log in
+          {t('nav.login')}
         </Link>
       </p>
     </div>
