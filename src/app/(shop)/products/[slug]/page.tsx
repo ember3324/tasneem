@@ -1,18 +1,16 @@
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { getProductBySlug } from '@/lib/catalog'
 import { getCurrentProfile } from '@/lib/profile'
 import { AddToCartButton } from '@/components/shop/add-to-cart-button'
 import { getLocale, t } from '@/lib/i18n/server'
 import { translateProductName } from '@/lib/i18n/translations'
-import type { Product } from '@/lib/types'
 
 export default async function ProductPage(props: PageProps<'/products/[slug]'>) {
   const { slug } = await props.params
-  const admin = createAdminClient()
 
-  const [{ data: product }, profile, locale] = await Promise.all([
-    admin.from('products').select('*').eq('slug', slug).maybeSingle<Product>(),
+  const [product, profile, locale] = await Promise.all([
+    getProductBySlug(slug),
     getCurrentProfile(),
     getLocale(),
   ])

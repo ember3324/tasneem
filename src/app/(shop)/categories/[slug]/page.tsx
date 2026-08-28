@@ -1,32 +1,25 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { getCategoryBySlug, getProductsByCategoryId } from '@/lib/catalog'
 import { getCurrentProfile } from '@/lib/profile'
 import { AddToCartButton } from '@/components/shop/add-to-cart-button'
 import { getLocale, t } from '@/lib/i18n/server'
 import { translateCategoryName, translateProductName } from '@/lib/i18n/translations'
-import type { Category, Product } from '@/lib/types'
 
 export default async function CategoryPage(props: PageProps<'/categories/[slug]'>) {
   const { slug } = await props.params
-  const admin = createAdminClient()
 
   // profile/locale don't depend on the category lookup, so kick them off
   // now instead of waiting until after it resolves.
   const profilePromise = getCurrentProfile()
   const localePromise = getLocale()
 
-  const { data: category } = await admin
-    .from('categories')
-    .select('*')
-    .eq('slug', slug)
-    .maybeSingle<Category>()
-
+  const category = await getCategoryBySlug(slug)
   if (!category) notFound()
 
-  const [{ data: products }, profile, locale] = await Promise.all([
-    admin.from('products').select('*').eq('category_id', category.id).order('sort_order').returns<Product[]>(),
+  const [products, profile, locale] = await Promise.all([
+    getProductsByCategoryId(category.id),
     profilePromise,
     localePromise,
   ])
@@ -56,7 +49,7 @@ export default async function CategoryPage(props: PageProps<'/categories/[slug]'
       <h1 className="text-2xl font-semibold text-neutral-900">{translateCategoryName(locale, category)}</h1>
 
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        {(products ?? []).map((product) => (
+        {products.map((product) => (
           <div
             key={product.id}
             className="flex flex-col overflow-hidden rounded-lg border-2 border-ocean-300 bg-white shadow-sm transition hover:border-ocean-500"
@@ -96,7 +89,7 @@ export default async function CategoryPage(props: PageProps<'/categories/[slug]'
         ))}
       </div>
 
-      {(!products || products.length === 0) && (
+      {products.length === 0 && (
         <p className="mt-6 text-sm text-neutral-500">{t(locale, 'shop.noProducts')}</p>
       )}
     </div>

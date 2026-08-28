@@ -2,9 +2,17 @@
 
 import { useActionState, useState } from 'react'
 import Link from 'next/link'
-import { LocationPicker } from './location-picker'
+import dynamic from 'next/dynamic'
 import { saveAddressAndCheckServiceArea } from '@/lib/actions/address'
 import { useLocale } from '@/lib/i18n/client'
+
+// mapbox-gl is a large library used only on this page — load it only once
+// this component actually mounts client-side instead of bundling it into
+// every render of the address form.
+const LocationPicker = dynamic(() => import('./location-picker').then((m) => m.LocationPicker), {
+  ssr: false,
+  loading: () => <div className="h-80 w-full animate-pulse rounded-lg border border-neutral-200 bg-neutral-100" />,
+})
 
 export function AddressForm() {
   const [state, formAction, pending] = useActionState(saveAddressAndCheckServiceArea, null)

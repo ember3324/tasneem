@@ -1,22 +1,17 @@
 import Link from 'next/link'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { getCategories } from '@/lib/catalog'
 import { getLocale, t } from '@/lib/i18n/server'
 import { translateCategoryName } from '@/lib/i18n/translations'
-import type { Category } from '@/lib/types'
 
 export default async function CategoriesPage() {
-  const admin = createAdminClient()
-  const [{ data: categories }, locale] = await Promise.all([
-    admin.from('categories').select('*').order('sort_order').returns<Category[]>(),
-    getLocale(),
-  ])
+  const [categories, locale] = await Promise.all([getCategories(), getLocale()])
 
   return (
     <div>
       <h1 className="text-2xl font-semibold text-neutral-900">{t(locale, 'shop.byCategory')}</h1>
 
       <div className="mt-6 grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
-        {(categories ?? []).map((category) => (
+        {categories.map((category) => (
           <Link
             key={category.id}
             href={`/categories/${category.slug}`}
@@ -29,7 +24,7 @@ export default async function CategoriesPage() {
         ))}
       </div>
 
-      {(!categories || categories.length === 0) && (
+      {categories.length === 0 && (
         <p className="mt-6 text-sm text-neutral-500">{t(locale, 'shop.noCategories')}</p>
       )}
     </div>
