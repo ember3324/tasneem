@@ -8,6 +8,7 @@ import type { Address } from '@/lib/types'
 export function AddressCard({ address }: { address: Address }) {
   const [isPending, startTransition] = useTransition()
   const [removed, setRemoved] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const { t } = useLocale()
 
   if (removed) return null
@@ -20,16 +21,26 @@ export function AddressCard({ address }: { address: Address }) {
         <p className="mt-1 text-xs text-neutral-400">
           {address.in_service_area ? t('account.withinArea') : t('account.outsideArea')}
         </p>
+        {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
       </div>
       <button
         type="button"
         disabled={isPending}
         onClick={() => {
-          // Hide immediately rather than waiting for the round-trip + revalidation.
-          setRemoved(true)
-          startTransition(() => deleteAddress(address.id))
+          setError(null)
+          // Wait for the real result instead of hiding immediately — a
+          // removal that silently fails (e.g. this address is tied to a
+          // past order) must not look like it succeeded.
+          startTransition(async () => {
+            const result = await deleteAddress(address.id)
+            if (result.error) {
+              setError(result.error)
+            } else {
+              setRemoved(true)
+            }
+          })
         }}
-        className="text-sm text-neutral-400 hover:text-red-600 disabled:opacity-50"
+        className="shrink-0 text-sm text-neutral-400 hover:text-red-600 disabled:opacity-50"
       >
         {t('cart.remove')}
       </button>

@@ -145,6 +145,10 @@ export const translations = {
   },
   'account.withinArea': { en: 'Within delivery area', ar: 'ضمن نطاق التوصيل' },
   'account.outsideArea': { en: 'Outside delivery area', ar: 'خارج نطاق التوصيل' },
+  'account.addressInUse': {
+    en: "This address is used in a past order and can't be removed.",
+    ar: 'هذا العنوان مستخدم في طلب سابق ولا يمكن إزالته.',
+  },
 
   'lang.toggle': { en: 'العربية', ar: 'English' },
   'whatsapp.chat': { en: 'Chat on WhatsApp', ar: 'تواصل عبر واتساب' },

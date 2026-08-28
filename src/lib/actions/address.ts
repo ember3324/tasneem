@@ -68,14 +68,28 @@ export async function saveAddressAndCheckServiceArea(
 
 // Scoped to user_id since the service-role admin client bypasses RLS — see
 // the note in lib/actions/cart.ts for why this check is required here.
-// Addresses referenced by a past order are protected by a FK constraint, so
-// the delete is a no-op for those rather than throwing.
-export async function deleteAddress(addressId: string) {
+//
+// Addresses referenced by a past order are protected by the
+// orders_address_id_fkey foreign key constraint (Postgres error 23503), so
+// the delete fails for those — this used to be swallowed silently, which
+// looked like a successful removal (the optimistic UI hid the card) until
+// the next real page load showed the address was never actually gone.
+export async function deleteAddress(addressId: string): Promise<{ error?: string }> {
+  const locale = await getLocale()
   const profile = await getCurrentProfile()
-  if (!profile) return
+  if (!profile) return { error: t(locale, 'address.error.mustBeLoggedIn') }
 
   const admin = createAdminClient()
-  await admin.from('addresses').delete().eq('id', addressId).eq('user_id', profile.id)
+  const { error } = await admin.from('addresses').delete().eq('id', addressId).eq('user_id', profile.id)
+
+  if (error) {
+    if (error.code === '23503') {
+      return { error: t(locale, 'account.addressInUse') }
+    }
+    return { error: error.message }
+  }
+
   revalidatePath('/account')
   revalidatePath('/checkout/address')
+  return {}
 }
