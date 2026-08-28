@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { useLocale } from '@/lib/i18n/client'
 
-const MAX_QUANTITY = 999
+const MAX_QUANTITY = 99999
 
 export function CartLineItem({
   name,
@@ -87,7 +87,7 @@ export function CartLineItem({
                 e.currentTarget.blur()
               }
             }}
-            className="w-10 rounded bg-transparent text-center text-sm focus:outline-none focus:ring-1 focus:ring-ocean-400"
+            className="w-14 rounded bg-transparent text-center text-sm focus:outline-none focus:ring-1 focus:ring-ocean-400"
           />
           <button type="button" className="px-3 py-1 text-neutral-600 hover:text-neutral-900" onClick={onIncrement}>
             +
