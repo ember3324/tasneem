@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useOptimistic, useTransition } from 'react'
 import { updateCartQuantity, removeFromCart } from '@/lib/actions/cart'
 import { useLocale } from '@/lib/i18n/client'
+import { translateProductName } from '@/lib/i18n/translations'
 import { CartLineItem } from './cart-line-item'
 import type { Product } from '@/lib/types'
 
@@ -25,7 +26,7 @@ function applyOptimisticAction(state: CartRow[], action: OptimisticAction): Cart
 export function CartItems({ items }: { items: CartRow[] }) {
   const [optimisticItems, applyOptimistic] = useOptimistic(items, applyOptimisticAction)
   const [, startTransition] = useTransition()
-  const { t } = useLocale()
+  const { locale, t } = useLocale()
 
   const total = optimisticItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0)
 
@@ -60,7 +61,7 @@ export function CartItems({ items }: { items: CartRow[] }) {
       {optimisticItems.map((item) => (
         <CartLineItem
           key={item.id}
-          name={item.product.name}
+          name={translateProductName(locale, item.product)}
           unit={item.product.unit}
           price={item.product.price}
           quantity={item.quantity}

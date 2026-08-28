@@ -5,7 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { getCurrentProfile } from '@/lib/profile'
 import { AddToCartButton } from '@/components/shop/add-to-cart-button'
 import { getLocale, t } from '@/lib/i18n/server'
-import { translateCategoryName } from '@/lib/i18n/translations'
+import { translateCategoryName, translateProductName } from '@/lib/i18n/translations'
 import type { Category, Product } from '@/lib/types'
 
 export default async function CategoryPage(props: PageProps<'/categories/[slug]'>) {
@@ -64,7 +64,7 @@ export default async function CategoryPage(props: PageProps<'/categories/[slug]'
               {product.image_url && (
                 <Image
                   src={product.image_url}
-                  alt={product.name}
+                  alt={translateProductName(locale, product)}
                   fill
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                   className="object-contain"
@@ -73,7 +73,7 @@ export default async function CategoryPage(props: PageProps<'/categories/[slug]'
             </Link>
             <div className="flex flex-1 flex-col p-2.5">
               <Link href={`/products/${product.slug}`} className="text-sm font-medium text-neutral-900">
-                {product.name}
+                {translateProductName(locale, product)}
               </Link>
               {product.unit && (
                 <p className="text-xs text-neutral-500">

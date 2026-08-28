@@ -156,11 +156,33 @@ export function translate(locale: Locale, key: TranslationKey): string {
 // Category names live in the DB (no name_ar column), so translate the seed
 // categories by slug here and fall back to the DB name for anything unknown.
 const categoryTranslations: Record<string, { en: string; ar: string }> = {
-  'water-bottles': { en: 'Water Bottles', ar: 'زجاجات المياه' },
-  dispensers: { en: 'Dispensers', ar: 'موزعات المياه' },
-  accessories: { en: 'Accessories', ar: 'الإكسسوارات' },
+  'bottled-water': { en: 'Bottled Water', ar: 'مياه معبأة' },
+  tissues: { en: 'Tissues', ar: 'مناديل ورقية' },
+  'personal-care': { en: 'Personal Care', ar: 'العناية الشخصية' },
 }
 
 export function translateCategoryName(locale: Locale, category: { slug: string; name: string }): string {
   return categoryTranslations[category.slug]?.[locale] ?? category.name
+}
+
+// Product names are stored in Arabic in the DB (the real, canonical name for
+// this market — also what shows up in order summaries and the admin Google
+// Sheet). English is a code-side override here, same slug-keyed pattern as
+// categoryTranslations above.
+const productTranslations: Record<string, { en: string; ar: string }> = {
+  'makyoon-water-330ml-20pack': {
+    en: 'Makyoon Spring Water 330ml — Pack of 20',
+    ar: 'مياه نبع مكيون 330 مل 20 عبوة',
+  },
+  'makyoon-water-330ml-24pack': {
+    en: 'Makyoon Spring Water 330ml — Pack of 24',
+    ar: 'مياه نبع مكيون 330 مل 24 عبوة',
+  },
+  'nafahat-tissues-500': { en: 'Nafahat Soft Tissues — 500 Sheets', ar: 'مناديل نفحات 500 حبة ناعم' },
+  'nafahat-tissues-300': { en: 'Nafahat Soft Tissues — 300 Sheets', ar: 'مناديل نفحات 300 حبة ناعم' },
+  miswak: { en: 'Miswak', ar: 'مسواك' },
+}
+
+export function translateProductName(locale: Locale, product: { slug: string; name: string }): string {
+  return productTranslations[product.slug]?.[locale] ?? product.name
 }

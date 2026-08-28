@@ -197,21 +197,29 @@ create policy "service_zones: public read active zones" on service_zones
 
 -- ─────────────────────────────────────────────────────────────
 -- Seed data (safe to delete/edit once you have real products)
+--
+-- Product/category `name` is stored in Arabic — the real, canonical name
+-- for this market. English names are a code-side override keyed by slug,
+-- see productTranslations / categoryTranslations in
+-- src/lib/i18n/translations.ts — every slug below must have an entry there.
 -- ─────────────────────────────────────────────────────────────
 insert into categories (name, slug, sort_order) values
-  ('Water Bottles', 'water-bottles', 1),
-  ('Dispensers', 'dispensers', 2),
-  ('Accessories', 'accessories', 3);
+  ('مياه معبأة', 'bottled-water', 1),
+  ('مناديل ورقية', 'tissues', 2),
+  ('العناية الشخصية', 'personal-care', 3);
 
-insert into products (category_id, name, slug, description, price, unit, sort_order)
-select id, '5-Gallon Refill Bottle', '5-gallon-refill-bottle', 'Purified 5-gallon (19L) refill bottle.', 12.00, '5-gallon bottle', 1
-from categories where slug = 'water-bottles'
+insert into products (category_id, name, slug, price, sort_order)
+select id, 'مياه نبع مكيون 330 مل 20 عبوة', 'makyoon-water-330ml-20pack', 10.00, 1
+from categories where slug = 'bottled-water'
 union all
-select id, '12-Pack Bottled Water (500ml)', '12-pack-bottled-water-500ml', 'Case of 12 individual 500ml bottles.', 15.00, 'case of 12', 2
-from categories where slug = 'water-bottles'
+select id, 'مياه نبع مكيون 330 مل 24 عبوة', 'makyoon-water-330ml-24pack', 12.00, 2
+from categories where slug = 'bottled-water'
 union all
-select id, 'Hot & Cold Water Dispenser', 'hot-cold-water-dispenser', 'Countertop hot & cold dispenser, fits 5-gallon bottles.', 250.00, 'unit', 1
-from categories where slug = 'dispensers'
+select id, 'مناديل نفحات 500 حبة ناعم', 'nafahat-tissues-500', 12.00, 1
+from categories where slug = 'tissues'
 union all
-select id, 'Bottle Pump (Manual)', 'bottle-pump-manual', 'Manual pump for 5-gallon bottles.', 20.00, 'unit', 1
-from categories where slug = 'accessories';
+select id, 'مناديل نفحات 300 حبة ناعم', 'nafahat-tissues-300', 8.00, 2
+from categories where slug = 'tissues'
+union all
+select id, 'مسواك', 'miswak', 3.00, 1
+from categories where slug = 'personal-care';

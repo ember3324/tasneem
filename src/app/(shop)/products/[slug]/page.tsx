@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { getCurrentProfile } from '@/lib/profile'
 import { AddToCartButton } from '@/components/shop/add-to-cart-button'
 import { getLocale, t } from '@/lib/i18n/server'
+import { translateProductName } from '@/lib/i18n/translations'
 import type { Product } from '@/lib/types'
 
 export default async function ProductPage(props: PageProps<'/products/[slug]'>) {
@@ -27,7 +28,7 @@ export default async function ProductPage(props: PageProps<'/products/[slug]'>) 
         <div className="relative aspect-square w-full bg-neutral-100">
           <Image
             src={product.image_url}
-            alt={product.name}
+            alt={translateProductName(locale, product)}
             fill
             sizes="(max-width: 640px) 100vw, 512px"
             className="object-contain"
@@ -36,7 +37,7 @@ export default async function ProductPage(props: PageProps<'/products/[slug]'>) 
         </div>
       )}
       <div className="p-6">
-        <h1 className="text-2xl font-semibold text-neutral-900">{product.name}</h1>
+        <h1 className="text-2xl font-semibold text-neutral-900">{translateProductName(locale, product)}</h1>
         {product.unit && (
           <p className="mt-1 text-sm text-neutral-500">
             <span dir="ltr">{product.unit}</span>
