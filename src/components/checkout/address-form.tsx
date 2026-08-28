@@ -55,18 +55,6 @@ export function AddressForm() {
         />
       </div>
 
-      <div>
-        <label htmlFor="city" className="block text-sm font-medium text-neutral-700">
-          {t('address.city')}
-        </label>
-        <input
-          id="city"
-          name="city"
-          type="text"
-          className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-neutral-500 focus:outline-none"
-        />
-      </div>
-
       {state && 'error' in state && <p className="text-sm text-red-600">{state.error}</p>}
 
       <button

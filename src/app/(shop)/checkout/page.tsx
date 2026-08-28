@@ -43,8 +43,7 @@ export default async function CheckoutPage(props: PageProps<'/checkout'>) {
       <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
         <h2 className="text-sm font-medium text-neutral-700">{t(locale, 'checkout.deliveringTo')}</h2>
         <p className="mt-1 text-sm text-neutral-600">
-          {address.address_line ? `${address.address_line}, ` : ''}
-          {address.city ?? ''}
+          {[address.address_line, address.city].filter(Boolean).join(', ')}
         </p>
 
         <h2 className="mt-4 text-sm font-medium text-neutral-700">{t(locale, 'checkout.items')}</h2>

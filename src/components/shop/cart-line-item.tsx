@@ -1,26 +1,27 @@
 'use client'
 
 import Image from 'next/image'
-import { useTransition } from 'react'
-import { updateCartQuantity, removeFromCart } from '@/lib/actions/cart'
 import { useLocale } from '@/lib/i18n/client'
 
 export function CartLineItem({
-  cartItemId,
   name,
   unit,
   price,
   quantity,
   imageUrl,
+  onIncrement,
+  onDecrement,
+  onRemove,
 }: {
-  cartItemId: string
   name: string
   unit: string | null
   price: number
   quantity: number
   imageUrl: string | null
+  onIncrement: () => void
+  onDecrement: () => void
+  onRemove: () => void
 }) {
-  const [isPending, startTransition] = useTransition()
   const { t } = useLocale()
 
   return (
@@ -44,35 +45,16 @@ export function CartLineItem({
 
       <div className="flex items-center gap-3">
         <div className="flex items-center rounded-lg border border-neutral-300">
-          <button
-            type="button"
-            disabled={isPending}
-            className="px-3 py-1 text-neutral-600 hover:text-neutral-900"
-            onClick={() =>
-              startTransition(() => updateCartQuantity(cartItemId, quantity - 1))
-            }
-          >
+          <button type="button" className="px-3 py-1 text-neutral-600 hover:text-neutral-900" onClick={onDecrement}>
             −
           </button>
           <span className="w-8 text-center text-sm">{quantity}</span>
-          <button
-            type="button"
-            disabled={isPending}
-            className="px-3 py-1 text-neutral-600 hover:text-neutral-900"
-            onClick={() =>
-              startTransition(() => updateCartQuantity(cartItemId, quantity + 1))
-            }
-          >
+          <button type="button" className="px-3 py-1 text-neutral-600 hover:text-neutral-900" onClick={onIncrement}>
             +
           </button>
         </div>
 
-        <button
-          type="button"
-          disabled={isPending}
-          onClick={() => startTransition(() => removeFromCart(cartItemId))}
-          className="text-sm text-neutral-400 hover:text-red-600"
-        >
+        <button type="button" onClick={onRemove} className="text-sm text-neutral-400 hover:text-red-600">
           {t('cart.remove')}
         </button>
       </div>

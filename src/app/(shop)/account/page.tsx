@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getCurrentProfile } from '@/lib/profile'
 import { getLocale, t } from '@/lib/i18n/server'
-import { RemoveAddressButton } from '@/components/shop/remove-address-button'
+import { AddressCard } from '@/components/shop/address-card'
 import type { Address } from '@/lib/types'
 
 export default async function AccountPage() {
@@ -44,22 +44,7 @@ export default async function AccountPage() {
         ) : (
           <div className="mt-4 space-y-3">
             {addresses.map((address) => (
-              <div
-                key={address.id}
-                className="flex items-start justify-between gap-4 rounded-xl border border-ocean-200 bg-white p-4 shadow-sm"
-              >
-                <div className="min-w-0">
-                  <p className="font-medium text-neutral-900">{address.label}</p>
-                  <p className="text-sm text-neutral-500">
-                    {address.address_line ? `${address.address_line}, ` : ''}
-                    {address.city ?? ''}
-                  </p>
-                  <p className="mt-1 text-xs text-neutral-400">
-                    {address.in_service_area ? t(locale, 'account.withinArea') : t(locale, 'account.outsideArea')}
-                  </p>
-                </div>
-                <RemoveAddressButton addressId={address.id} />
-              </div>
+              <AddressCard key={address.id} address={address} />
             ))}
           </div>
         )}

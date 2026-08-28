@@ -117,6 +117,7 @@ export async function createOrder(
       paymentMethod,
       status: 'pending',
       createdAt: order.created_at,
+      addressDetails: address.address_line,
     })
     await admin
       .from('orders')

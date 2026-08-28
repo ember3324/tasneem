@@ -25,7 +25,6 @@ export async function saveAddressAndCheckServiceArea(
   const defaultLabel = t(locale, 'address.labelPlaceholder')
   const label = String(formData.get('label') ?? defaultLabel).trim() || defaultLabel
   const addressLine = String(formData.get('addressLine') ?? '').trim()
-  const city = String(formData.get('city') ?? '').trim()
 
   if (Number.isNaN(lat) || Number.isNaN(lng)) {
     return { error: t(locale, 'address.error.needLocation') }
@@ -46,7 +45,6 @@ export async function saveAddressAndCheckServiceArea(
       user_id: profile.id,
       label,
       address_line: addressLine || null,
-      city: city || null,
       lat,
       lng,
       in_service_area: inServiceArea,

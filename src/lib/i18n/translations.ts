@@ -71,7 +71,6 @@ export const translations = {
   'address.label': { en: 'Label', ar: 'التسمية' },
   'address.labelPlaceholder': { en: 'Home', ar: 'المنزل' },
   'address.details': { en: 'Address details (building, street, apartment)', ar: 'تفاصيل العنوان (المبنى، الشارع، الشقة)' },
-  'address.city': { en: 'City', ar: 'المدينة' },
   'address.continue': { en: 'Continue to checkout', ar: 'متابعة إلى الدفع' },
   'address.checking': { en: 'Checking…', ar: 'جارٍ التحقق…' },
   'address.outsideTitle': {

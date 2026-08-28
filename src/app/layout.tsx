@@ -20,7 +20,7 @@ const notoSansArabic = Noto_Sans_Arabic({
 });
 
 export const metadata: Metadata = {
-  title: "AquaShop",
+  title: "Tasneem",
   description: "Water bottles and delivery essentials, delivered.",
 };
 

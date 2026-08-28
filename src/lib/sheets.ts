@@ -12,11 +12,16 @@ import { google } from 'googleapis'
 //   H: Status             admin-edited dropdown, see STATUS_TO_SHEET below
 //   I: Proof Photo URL    admin pastes this in once delivered
 //   J: Created At
+//   K: Address Details    optional free-text (building/street/apartment)
+//
+// New columns must be appended at the end, never inserted in the middle —
+// fetchSheetUpdates() below reads columns H/I by fixed index (row[7]/row[8])
+// and a mid-sheet insert would silently shift those and break the sync.
 // ─────────────────────────────────────────────────────────────
 
 const SHEET_NAME = 'Orders'
-const DATA_RANGE = `${SHEET_NAME}!A2:J`
-const HEADER_RANGE = `${SHEET_NAME}!A1:J1`
+const DATA_RANGE = `${SHEET_NAME}!A2:K`
+const HEADER_RANGE = `${SHEET_NAME}!A1:K1`
 
 export const HEADER_ROW = [
   'Order ID',
@@ -29,6 +34,7 @@ export const HEADER_ROW = [
   'Status',
   'Proof Photo URL',
   'Created At',
+  'Address Details',
 ]
 
 // DB enum <-> human-readable sheet text. Keep in sync with the `status`
@@ -75,9 +81,15 @@ export type OrderForSheet = {
   paymentMethod: 'cash' | 'card'
   status: string
   createdAt: string
+  addressDetails: string | null
 }
 
-/** Ensures the header row exists (idempotent — safe to call every time). */
+/**
+ * Ensures the header row exists and has every column (idempotent — safe to
+ * call every time). Also self-heals a header that predates a newly-added
+ * trailing column, e.g. when "Address Details" was added after the sheet
+ * was already in use.
+ */
 export async function ensureSheetHeader() {
   const sheets = getSheetsClient()
   const sheetId = process.env.GOOGLE_SHEET_ID!
@@ -87,7 +99,8 @@ export async function ensureSheetHeader() {
     range: HEADER_RANGE,
   })
 
-  if (!existing.data.values || existing.data.values.length === 0) {
+  const currentHeader = existing.data.values?.[0] ?? []
+  if (currentHeader.length < HEADER_ROW.length) {
     await sheets.spreadsheets.values.update({
       spreadsheetId: sheetId,
       range: HEADER_RANGE,
@@ -113,6 +126,7 @@ export async function appendOrderRow(order: OrderForSheet): Promise<number> {
     STATUS_TO_SHEET[order.status] ?? order.status,
     '',
     order.createdAt,
+    order.addressDetails ?? '',
   ]
 
   const result = await sheets.spreadsheets.values.append({

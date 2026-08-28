@@ -22,7 +22,7 @@ export function ShopHeader({
     <header className="sticky top-0 z-10 border-b border-ocean-200 bg-white/85 backdrop-blur-md">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
         <Link href="/categories" className="text-lg font-semibold text-ocean-700">
-          AquaShop
+          Tasneem
         </Link>
 
         {/* Desktop nav */}
