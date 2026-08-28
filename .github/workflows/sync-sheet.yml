@@ -11,7 +11,13 @@ name: Sync Google Sheet order updates
 
 on:
   schedule:
-    - cron: '*/2 * * * *'
+    # GitHub's documented minimum interval for scheduled workflows is every 5
+    # minutes — a sub-5-minute cron like the original `*/2 * * * *` is
+    # accepted at parse time but GitHub's scheduler does not reliably honor
+    # it (observed: zero automatic firings over 20+ minutes of watching,
+    # while manual workflow_dispatch runs always succeeded). `*/5` is the
+    # fastest interval GitHub actually supports.
+    - cron: '*/5 * * * *'
   workflow_dispatch: {}
 
 jobs:

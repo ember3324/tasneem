@@ -91,7 +91,8 @@ to `/api/cron/sync-sheet`).
 Vercel's free Hobby plan only allows cron jobs that fire once a day, which
 is too slow for admin edits to show up promptly. Instead, this repo includes
 [`.github/workflows/sync-sheet.yml`](.github/workflows/sync-sheet.yml), which
-calls the same endpoint from GitHub Actions every 2 minutes for free. After
+calls the same endpoint from GitHub Actions every 5 minutes for free (the
+fastest interval GitHub's scheduler reliably supports). After
 you push this repo to GitHub, add two repository secrets (**Settings →
 Secrets and variables → Actions**):
 - `SITE_URL` — your deployed URL, e.g. `https://your-project.vercel.app`
