@@ -56,6 +56,9 @@ export async function saveAddressAndCheckServiceArea(
     return { error: error?.message ?? t(locale, 'address.error.couldNotSave') }
   }
 
+  revalidatePath('/account')
+  revalidatePath('/checkout/address')
+
   if (!inServiceArea) {
     return { outsideServiceArea: true }
   }
@@ -74,4 +77,5 @@ export async function deleteAddress(addressId: string) {
   const admin = createAdminClient()
   await admin.from('addresses').delete().eq('id', addressId).eq('user_id', profile.id)
   revalidatePath('/account')
+  revalidatePath('/checkout/address')
 }
