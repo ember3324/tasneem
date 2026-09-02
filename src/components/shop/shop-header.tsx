@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { signOut } from '@/lib/actions/auth'
 import { useLocale } from '@/lib/i18n/client'
-import { LanguageToggle } from './language-toggle'
+import { POLICIES } from '@/lib/policies'
 
 export function ShopHeader({
   loggedIn,
@@ -22,7 +22,7 @@ export function ShopHeader({
     <header className="sticky top-0 z-10 border-b border-ocean-200 bg-white/85 backdrop-blur-md">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
         <Link href="/categories" className="text-lg font-semibold text-ocean-700">
-          Tasneem
+          التسنيم المكي
         </Link>
 
         {/* Desktop nav */}
@@ -33,6 +33,22 @@ export function ShopHeader({
           >
             {t('nav.shop')}
           </Link>
+          <details className="group relative">
+            <summary className="list-none rounded-lg border border-ocean-200 px-3 py-1.5 hover:border-ocean-400 hover:bg-ocean-50 hover:text-ocean-600 [&::-webkit-details-marker]:hidden">
+              {t('nav.policies')}
+            </summary>
+            <div className="absolute end-0 top-full z-20 mt-1 w-56 rounded-lg border border-ocean-200 bg-white py-1.5 shadow-md">
+              {POLICIES.map((policy) => (
+                <Link
+                  key={policy.slug}
+                  href={`/policies/${policy.slug}`}
+                  className="block px-3 py-2 hover:bg-ocean-50 hover:text-ocean-600"
+                >
+                  {policy.navLabel}
+                </Link>
+              ))}
+            </div>
+          </details>
           {loggedIn && (
             <Link
               href="/orders"
@@ -72,15 +88,13 @@ export function ShopHeader({
               {t('nav.login')}
             </Link>
           )}
-          <LanguageToggle />
         </nav>
 
-        {/* Mobile: language toggle + hamburger */}
+        {/* Mobile: hamburger */}
         <div className="flex items-center gap-2 sm:hidden">
-          <LanguageToggle />
           <button
             type="button"
-            aria-label="Menu"
+            aria-label="القائمة"
             onClick={() => setMenuOpen((v) => !v)}
             className="flex h-9 w-9 items-center justify-center rounded-lg border border-ocean-300 hover:bg-ocean-50"
           >
@@ -114,6 +128,21 @@ export function ShopHeader({
             >
               {t('nav.shop')}
             </Link>
+            <details className="rounded-lg border border-ocean-200 [&_summary::-webkit-details-marker]:hidden">
+              <summary className="list-none px-2 py-2">{t('nav.policies')}</summary>
+              <div className="flex flex-col gap-1 border-t border-ocean-200 px-2 py-1.5">
+                {POLICIES.map((policy) => (
+                  <Link
+                    key={policy.slug}
+                    href={`/policies/${policy.slug}`}
+                    className="rounded-lg px-2 py-1.5 hover:bg-ocean-50"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    {policy.navLabel}
+                  </Link>
+                ))}
+              </div>
+            </details>
             {loggedIn && (
               <Link
                 href="/orders"

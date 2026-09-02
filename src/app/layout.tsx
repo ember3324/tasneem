@@ -20,8 +20,8 @@ const notoSansArabic = Noto_Sans_Arabic({
 });
 
 export const metadata: Metadata = {
-  title: "Tasneem",
-  description: "Water bottles and delivery essentials, delivered.",
+  title: "التسنيم المكي",
+  description: "مياه ومستلزمات التوصيل، توصيلة لباب بيتك.",
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
@@ -29,8 +29,8 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
 
   return (
     <html
-      lang={locale}
-      dir={locale === "ar" ? "rtl" : "ltr"}
+      lang="ar"
+      dir="rtl"
       className={`${geistSans.variable} ${geistMono.variable} ${notoSansArabic.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">

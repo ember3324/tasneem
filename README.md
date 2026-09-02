@@ -1,4 +1,4 @@
-# Tasneem
+# التسنيم المكي (Tasneem Al-Makki)
 
 A water bottle & delivery essentials e-commerce site for the Saudi market:
 phone + name signup (no password, no OTP — see `src/lib/session.ts` for the

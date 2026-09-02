@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useLocale } from '@/lib/i18n/client'
 
 const MAX_QUANTITY = 99999
@@ -32,13 +32,17 @@ export function CartLineItem({
   // Local draft so the input can hold whatever the user is mid-typing
   // (e.g. "" while clearing the field to type "50") without the quantity
   // prop stomping it on every keystroke. Only commits — and syncs back
-  // from props — once the field isn't focused.
+  // from props — once the field isn't focused. Synced during render (the
+  // React-recommended way to adjust state from a changed prop) rather than
+  // in an effect, which would cause an extra render pass on every change.
   const [draft, setDraft] = useState(String(quantity))
   const [editing, setEditing] = useState(false)
+  const [prevQuantity, setPrevQuantity] = useState(quantity)
 
-  useEffect(() => {
+  if (quantity !== prevQuantity) {
+    setPrevQuantity(quantity)
     if (!editing) setDraft(String(quantity))
-  }, [quantity, editing])
+  }
 
   function commit() {
     setEditing(false)
