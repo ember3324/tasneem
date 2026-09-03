@@ -29,10 +29,8 @@ export const translations = {
   'auth.error.unrecognizedNumber': 'هذا الرقم غير مسجّل — أدخل اسمك لإنشاء حساب.',
   'auth.error.couldNotCreate': 'تعذّر إنشاء الحساب.',
 
-  'shop.byCategory': 'تسوّق حسب الفئة',
-  'shop.backToCategories': 'رجوع',
-  'shop.noCategories': 'لا توجد فئات بعد.',
-  'shop.noProducts': 'لا توجد منتجات في هذه الفئة بعد.',
+  'shop.title': 'المنتجات',
+  'shop.noProducts': 'لا توجد منتجات بعد.',
   'shop.outOfStock': 'غير متوفر',
   'shop.addToCart': 'أضف إلى السلة',
   'shop.adding': 'جارٍ الإضافة…',
@@ -124,25 +122,11 @@ export function translate(_locale: Locale, key: TranslationKey): string {
   return translations[key]
 }
 
-// Category names live in the DB (no name_ar column); the seed categories'
-// canonical Arabic names are already what's stored there, so this only
-// exists as a fallback map for any slug that predates that.
-const categoryTranslations: Record<string, string> = {
-  'bottled-water': 'مياه معبأة',
-}
-
-export function translateCategoryName(_locale: Locale, category: { slug: string; name: string }): string {
-  return categoryTranslations[category.slug] ?? category.name
-}
-
-// Product names are stored in Arabic in the DB (the real, canonical name for
-// this market — also what shows up in order summaries and the admin Google
-// Sheet). This is a slug-keyed fallback, same pattern as categoryTranslations.
-const productTranslations: Record<string, string> = {
-  'makyoon-water-330ml-20pack': 'مياه نبع مكيون 330 مل 20 عبوة',
-  'makyoon-water-330ml-24pack': 'مياه نبع مكيون 330 مل 24 عبوة',
-}
-
+// Product names are stored in Arabic in the DB directly (the real,
+// canonical name for this market — also what shows up in order summaries
+// and the admin Google Sheet), so this is just a passthrough. Kept as a
+// function (rather than inlining `product.name` at every call site) in case
+// a slug-keyed override is ever needed again.
 export function translateProductName(_locale: Locale, product: { slug: string; name: string }): string {
-  return productTranslations[product.slug] ?? product.name
+  return product.name
 }

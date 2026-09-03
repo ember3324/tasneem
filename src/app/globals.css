@@ -31,13 +31,17 @@ body {
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 
   /* Ocean wallpaper, washed with a light overlay (image at ~20% strength,
-     i.e. 80% transparent) so text and cards on top stay easy to read. */
+     i.e. 80% transparent) so text and cards on top stay easy to read. The
+     brand mark + bottle are composited into the bottom of this image, so
+     it's bottom-anchored (not top-anchored) to keep that visible instead of
+     cropping it off — a tall image under `cover` at typical viewport sizes
+     would otherwise crop out everything below roughly its middle third. */
   background-color: #eef8fb;
   background-image:
     linear-gradient(rgba(238, 248, 251, 0.8), rgba(238, 248, 251, 0.8)),
     url('/ocean-bg.webp');
   background-size: cover;
-  background-position: top center;
+  background-position: bottom center;
   background-repeat: no-repeat;
   background-attachment: fixed;
   min-height: 100vh;
