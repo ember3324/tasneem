@@ -56,11 +56,11 @@ function OrderRow({ order, locale }: { order: Order; locale: Locale }) {
       href={`/orders/${order.order_number}`}
       className="flex items-center justify-between rounded-xl border border-neutral-200 bg-white p-4 shadow-sm hover:border-neutral-400"
     >
-      <div>
+      <div className="min-w-0 flex-1">
         <p dir="ltr" className="font-medium text-neutral-900">{order.order_number}</p>
-        <p dir="ltr" className="text-sm text-neutral-500">{order.items_summary}</p>
+        <p className="truncate text-sm text-neutral-500">{order.items_summary}</p>
       </div>
-      <div className="text-right">
+      <div className="ms-4 shrink-0 text-end">
         <p className="text-sm font-medium text-neutral-900">
           {t(locale, `status.${order.status}`)}
         </p>

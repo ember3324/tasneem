@@ -71,11 +71,11 @@ export default async function OrderDetailPage(props: PageProps<'/orders/[orderNu
         <h2 className="text-sm font-medium text-neutral-700">{t(locale, 'orders.items')}</h2>
         <ul className="mt-2 space-y-1 text-sm text-neutral-600">
           {(items ?? []).map((item) => (
-            <li key={item.id} className="flex justify-between">
-              <span dir="ltr">
-                {item.quantity}x {item.product_name}
+            <li key={item.id} className="flex justify-between gap-3">
+              <span className="min-w-0">
+                <span dir="ltr">{item.quantity}x</span> {item.product_name}
               </span>
-              <span dir="ltr">{item.line_total.toFixed(2)} SAR</span>
+              <span dir="ltr" className="shrink-0">{item.line_total.toFixed(2)} SAR</span>
             </li>
           ))}
         </ul>
