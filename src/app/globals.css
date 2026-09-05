@@ -6,17 +6,19 @@
 }
 
 @theme {
-  /* Oceanic accent scale used across buttons, borders, and highlights. */
-  --color-ocean-50: #f0f9fb;
-  --color-ocean-100: #dcf0f5;
-  --color-ocean-200: #b7e1ea;
-  --color-ocean-300: #86cbdb;
-  --color-ocean-400: #4fadc7;
-  --color-ocean-500: #2f8fae;
-  --color-ocean-600: #21748f;
-  --color-ocean-700: #1d5d73;
-  --color-ocean-800: #1b4b5e;
-  --color-ocean-900: #193f4f;
+  /* Oceanic accent scale used across buttons, borders, and highlights.
+     Same hues as the original palette, but at half the saturation and a
+     touch lighter — a softer, less saturated "bevel" look site-wide. */
+  --color-ocean-50: #f5f9fa;
+  --color-ocean-100: #f5f9f9;
+  --color-ocean-200: #d7e5e8;
+  --color-ocean-300: #afcad1;
+  --color-ocean-400: #80a9b4;
+  --color-ocean-500: #5a90a2;
+  --color-ocean-600: #477888;
+  --color-ocean-700: #3d6471;
+  --color-ocean-800: #375561;
+  --color-ocean-900: #324a55;
 }
 
 @theme inline {

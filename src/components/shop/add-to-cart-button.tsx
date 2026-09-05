@@ -26,7 +26,7 @@ export function AddToCartButton({ productId, loggedIn }: { productId: string; lo
           setTimeout(() => setAdded(false), 1500)
         })
       }}
-      className="w-full rounded-lg border border-ocean-400 bg-ocean-50 py-2 text-sm font-semibold text-ocean-700 transition hover:border-ocean-500 hover:bg-ocean-100 disabled:opacity-50"
+      className="w-full rounded-md border border-ocean-400 bg-ocean-50 py-1 text-[11px] font-semibold text-ocean-700 transition hover:border-ocean-500 hover:bg-ocean-100 disabled:opacity-50"
     >
       {isPending ? t('shop.adding') : added ? t('shop.added') : t('shop.addToCart')}
     </button>

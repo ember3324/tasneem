@@ -13,7 +13,7 @@ export default async function ShopPage() {
     <div>
       <h1 className="text-2xl font-semibold text-neutral-900">{t(locale, 'shop.title')}</h1>
 
-      <div className="mt-6 grid grid-cols-4 gap-2 sm:grid-cols-5 lg:grid-cols-6">
+      <div className="mt-6 grid grid-cols-2 gap-4">
         {products.map((product, i) => (
           <div
             key={product.id}
@@ -26,24 +26,24 @@ export default async function ShopPage() {
                   src={product.image_url}
                   alt={translateProductName(locale, product)}
                   fill
-                  sizes="(max-width: 640px) 25vw, (max-width: 1024px) 20vw, 16vw"
+                  sizes="(max-width: 640px) 50vw, 40vw"
                   className="object-contain"
                 />
               )}
             </Link>
-            <div className="flex flex-1 flex-col gap-1 p-1.5">
+            <div className="flex flex-1 flex-col gap-2 p-3">
               <Link
                 href={`/products/${product.slug}`}
-                className="rounded bg-ocean-50 px-1 py-0.5 text-center text-[10px] font-semibold text-neutral-900"
+                className="rounded-md bg-ocean-50 px-2 py-1.5 text-center text-sm font-semibold text-neutral-900"
               >
                 مياه 330 مل
               </Link>
               {product.unit && (
-                <span className="rounded bg-neutral-50 px-1 py-0.5 text-center text-[10px] text-neutral-600">
+                <span className="rounded-md bg-neutral-50 px-2 py-1.5 text-center text-sm text-neutral-600">
                   {product.unit}
                 </span>
               )}
-              <span dir="ltr" className="rounded bg-neutral-50 px-1 py-0.5 text-center text-[10px] font-semibold text-neutral-900">
+              <span dir="ltr" className="rounded-md bg-neutral-50 px-2 py-1.5 text-center text-sm font-semibold text-neutral-900">
                 {product.price.toFixed(2)} SAR
               </span>
               <div className="mt-auto">
