@@ -13,7 +13,7 @@ export default async function ShopPage() {
     <div>
       <h1 className="text-2xl font-semibold text-neutral-900">{t(locale, 'shop.title')}</h1>
 
-      <div className="mt-6 grid grid-cols-3 gap-2.5 sm:grid-cols-4 lg:grid-cols-5">
+      <div className="mt-6 grid grid-cols-4 gap-2 sm:grid-cols-5 lg:grid-cols-6">
         {products.map((product, i) => (
           <div
             key={product.id}
@@ -26,28 +26,26 @@ export default async function ShopPage() {
                   src={product.image_url}
                   alt={translateProductName(locale, product)}
                   fill
-                  sizes="(max-width: 640px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                  sizes="(max-width: 640px) 25vw, (max-width: 1024px) 20vw, 16vw"
                   className="object-contain"
                 />
               )}
             </Link>
-            <div className="flex flex-1 flex-col gap-1.5 p-2">
+            <div className="flex flex-1 flex-col gap-1 p-1.5">
               <Link
                 href={`/products/${product.slug}`}
-                className="rounded-md bg-ocean-50 px-1.5 py-1 text-center text-xs font-semibold text-neutral-900"
+                className="rounded bg-ocean-50 px-1 py-0.5 text-center text-[10px] font-semibold text-neutral-900"
               >
-                {translateProductName(locale, product)}
+                مياه 330 مل
               </Link>
-              <div className="flex gap-1.5">
-                {product.unit && (
-                  <span className="flex-1 rounded-md bg-neutral-50 px-1 py-1 text-center text-[11px] text-neutral-600">
-                    {product.unit}
-                  </span>
-                )}
-                <span dir="ltr" className="flex-1 rounded-md bg-neutral-50 px-1 py-1 text-center text-[11px] font-semibold text-neutral-900">
-                  {product.price.toFixed(2)} SAR
+              {product.unit && (
+                <span className="rounded bg-neutral-50 px-1 py-0.5 text-center text-[10px] text-neutral-600">
+                  {product.unit}
                 </span>
-              </div>
+              )}
+              <span dir="ltr" className="rounded bg-neutral-50 px-1 py-0.5 text-center text-[10px] font-semibold text-neutral-900">
+                {product.price.toFixed(2)} SAR
+              </span>
               <div className="mt-auto">
                 {product.in_stock ? (
                   <AddToCartButton productId={product.id} loggedIn={!!profile} />
