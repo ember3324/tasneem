@@ -19,6 +19,14 @@
   --color-ocean-700: #3d6471;
   --color-ocean-800: #375561;
   --color-ocean-900: #324a55;
+
+  /* A separate, more saturated "brand" blue for CTAs and active states —
+     deliberately more vivid than the softened ocean-* bevel scale so
+     primary actions still pop against it instead of blending in. */
+  --color-brand-400: #478fc2;
+  --color-brand-500: #3674a1;
+  --color-brand-600: #285a80;
+  --color-brand-700: #1d4363;
 }
 
 @theme inline {

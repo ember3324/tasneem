@@ -12,13 +12,14 @@ export default async function ShopPage() {
   return (
     <div>
       <h1 className="text-2xl font-semibold text-neutral-900">{t(locale, 'shop.title')}</h1>
+      <p className="mt-1 text-sm text-neutral-500">اختر الكمية المناسبة لاحتياجك</p>
 
       <div className="mt-6 grid grid-cols-2 gap-4">
         {products.map((product, i) => (
           <div
             key={product.id}
             style={{ animationDelay: `${i * 40}ms` }}
-            className="flex animate-fade-in-up flex-col overflow-hidden rounded-lg border-2 border-ocean-300 bg-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-ocean-500 hover:shadow-md"
+            className="flex animate-fade-in-up flex-col overflow-hidden rounded-xl bg-white shadow-md transition duration-200 hover:-translate-y-0.5 hover:shadow-lg"
           >
             <Link href={`/products/${product.slug}`} className="relative block aspect-square w-full bg-neutral-100">
               {product.image_url && (
@@ -31,22 +32,22 @@ export default async function ShopPage() {
                 />
               )}
             </Link>
-            <div className="flex flex-1 flex-col gap-2 p-3">
-              <Link
-                href={`/products/${product.slug}`}
-                className="rounded-md bg-ocean-50 px-2 py-1.5 text-center text-sm font-semibold text-neutral-900"
-              >
+            <div className="flex flex-1 flex-col items-center gap-1.5 p-3 text-center">
+              <Link href={`/products/${product.slug}`} className="text-sm font-semibold text-neutral-800">
                 مياه 330 مل
               </Link>
               {product.unit && (
-                <span className="rounded-md bg-neutral-50 px-2 py-1.5 text-center text-sm text-neutral-600">
+                <span className="inline-flex items-center gap-1 text-sm text-neutral-500">
                   {product.unit}
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 8l-9-5-9 5 9 5 9-5zM3 8v8l9 5 9-5V8M12 13v8" />
+                  </svg>
                 </span>
               )}
-              <span dir="ltr" className="rounded-md bg-neutral-50 px-2 py-1.5 text-center text-sm font-semibold text-neutral-900">
+              <span dir="ltr" className="text-lg font-bold text-neutral-900">
                 {product.price.toFixed(2)} SAR
               </span>
-              <div className="mt-auto">
+              <div className="mt-1 w-full">
                 {product.in_stock ? (
                   <AddToCartButton productId={product.id} loggedIn={!!profile} />
                 ) : (
