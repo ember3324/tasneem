@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
 import Link from 'next/link'
 import { signOut } from '@/lib/actions/auth'
 import { useLocale } from '@/lib/i18n/client'
-import { POLICIES } from '@/lib/policies'
+
+const linkClass =
+  'rounded-lg border border-ocean-200 px-3 py-1.5 text-sm font-medium text-neutral-600 transition hover:border-ocean-400 hover:bg-ocean-50 hover:text-ocean-600'
 
 export function ShopHeader({
   loggedIn,
@@ -14,181 +15,47 @@ export function ShopHeader({
   cartCount: number
 }) {
   const { t } = useLocale()
-  const [menuOpen, setMenuOpen] = useState(false)
-
   const cartLabel = cartCount > 0 ? `${t('nav.cart')} (${cartCount})` : t('nav.cart')
 
   return (
     <header className="sticky top-0 z-10 border-b border-ocean-200 bg-white/85 backdrop-blur-md">
-      <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
+      <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-4">
         <Link href="/categories" className="text-lg font-semibold text-ocean-700">
           التسنيم المكي
         </Link>
 
-        {/* Desktop nav */}
-        <nav className="hidden items-center gap-2 text-sm font-medium text-neutral-600 sm:flex">
-          <Link
-            href="/categories"
-            className="rounded-lg border border-ocean-200 px-3 py-1.5 hover:border-ocean-400 hover:bg-ocean-50 hover:text-ocean-600"
-          >
+        {/* Flat, always-visible nav — wraps naturally on narrow screens
+            instead of collapsing behind a hamburger/dropdown. */}
+        <nav className="flex flex-wrap items-center gap-2">
+          <Link href="/categories" className={linkClass}>
             {t('nav.shop')}
           </Link>
-          <details className="group relative">
-            <summary className="list-none rounded-lg border border-ocean-200 px-3 py-1.5 hover:border-ocean-400 hover:bg-ocean-50 hover:text-ocean-600 [&::-webkit-details-marker]:hidden">
-              {t('nav.policies')}
-            </summary>
-            <div className="absolute end-0 top-full z-20 mt-1 w-56 rounded-lg border border-ocean-200 bg-white py-1.5 shadow-md">
-              {POLICIES.map((policy) => (
-                <Link
-                  key={policy.slug}
-                  href={`/policies/${policy.slug}`}
-                  className="block px-3 py-2 hover:bg-ocean-50 hover:text-ocean-600"
-                >
-                  {policy.navLabel}
-                </Link>
-              ))}
-            </div>
-          </details>
           {loggedIn && (
-            <Link
-              href="/orders"
-              className="rounded-lg border border-ocean-200 px-3 py-1.5 hover:border-ocean-400 hover:bg-ocean-50 hover:text-ocean-600"
-            >
+            <Link href="/orders" className={linkClass}>
               {t('nav.orders')}
             </Link>
           )}
-          <Link
-            href="/cart"
-            className="rounded-lg border border-ocean-200 px-3 py-1.5 hover:border-ocean-400 hover:bg-ocean-50 hover:text-ocean-600"
-          >
+          <Link href="/cart" className={linkClass}>
             {cartLabel}
           </Link>
           {loggedIn ? (
             <>
-              <Link
-                href="/account"
-                className="rounded-lg border border-ocean-200 px-3 py-1.5 hover:border-ocean-400 hover:bg-ocean-50 hover:text-ocean-600"
-              >
+              <Link href="/account" className={linkClass}>
                 {t('nav.account')}
               </Link>
               <form action={signOut}>
-                <button
-                  type="submit"
-                  className="rounded-lg border border-ocean-200 px-3 py-1.5 hover:border-ocean-400 hover:bg-ocean-50 hover:text-ocean-600"
-                >
+                <button type="submit" className={linkClass}>
                   {t('nav.logout')}
                 </button>
               </form>
             </>
           ) : (
-            <Link
-              href="/login"
-              className="rounded-lg border border-ocean-200 px-3 py-1.5 hover:border-ocean-400 hover:bg-ocean-50 hover:text-ocean-600"
-            >
+            <Link href="/login" className={linkClass}>
               {t('nav.login')}
             </Link>
           )}
         </nav>
-
-        {/* Mobile: hamburger */}
-        <div className="flex items-center gap-2 sm:hidden">
-          <button
-            type="button"
-            aria-label="القائمة"
-            onClick={() => setMenuOpen((v) => !v)}
-            className="flex h-9 w-9 items-center justify-center rounded-lg border border-ocean-300 hover:bg-ocean-50"
-          >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-            >
-              {menuOpen ? (
-                <path d="M6 6l12 12M18 6L6 18" />
-              ) : (
-                <path d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
-        </div>
       </div>
-
-      {/* Mobile dropdown menu */}
-      {menuOpen && (
-        <nav className="border-t border-ocean-200 bg-white/95 backdrop-blur-md px-4 py-3 text-sm font-medium text-neutral-700 sm:hidden">
-          <div className="flex flex-col gap-1.5">
-            <Link
-              href="/categories"
-              className="rounded-lg border border-ocean-200 px-2 py-2 hover:bg-ocean-50"
-              onClick={() => setMenuOpen(false)}
-            >
-              {t('nav.shop')}
-            </Link>
-            <details className="rounded-lg border border-ocean-200 [&_summary::-webkit-details-marker]:hidden">
-              <summary className="list-none px-2 py-2">{t('nav.policies')}</summary>
-              <div className="flex flex-col gap-1 border-t border-ocean-200 px-2 py-1.5">
-                {POLICIES.map((policy) => (
-                  <Link
-                    key={policy.slug}
-                    href={`/policies/${policy.slug}`}
-                    className="rounded-lg px-2 py-1.5 hover:bg-ocean-50"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    {policy.navLabel}
-                  </Link>
-                ))}
-              </div>
-            </details>
-            {loggedIn && (
-              <Link
-                href="/orders"
-                className="rounded-lg border border-ocean-200 px-2 py-2 hover:bg-ocean-50"
-                onClick={() => setMenuOpen(false)}
-              >
-                {t('nav.orders')}
-              </Link>
-            )}
-            <Link
-              href="/cart"
-              className="rounded-lg border border-ocean-200 px-2 py-2 hover:bg-ocean-50"
-              onClick={() => setMenuOpen(false)}
-            >
-              {cartLabel}
-            </Link>
-            {loggedIn ? (
-              <>
-                <Link
-                  href="/account"
-                  className="rounded-lg border border-ocean-200 px-2 py-2 hover:bg-ocean-50"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  {t('nav.account')}
-                </Link>
-                <form action={signOut}>
-                  <button
-                    type="submit"
-                    className="w-full rounded-lg border border-ocean-200 px-2 py-2 text-left hover:bg-ocean-50 rtl:text-right"
-                  >
-                    {t('nav.logout')}
-                  </button>
-                </form>
-              </>
-            ) : (
-              <Link
-                href="/login"
-                className="rounded-lg border border-ocean-200 px-2 py-2 hover:bg-ocean-50"
-                onClick={() => setMenuOpen(false)}
-              >
-                {t('nav.login')}
-              </Link>
-            )}
-          </div>
-        </nav>
-      )}
     </header>
   )
 }

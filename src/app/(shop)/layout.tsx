@@ -1,7 +1,9 @@
+import Image from 'next/image'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getCurrentProfile } from '@/lib/profile'
 import { getLocale } from '@/lib/i18n/server'
 import { ShopHeader } from '@/components/shop/shop-header'
+import { SiteFooter } from '@/components/shop/site-footer'
 import { WhatsAppButton } from '@/components/shop/whatsapp-button'
 
 export default async function ShopLayout({ children }: { children: React.ReactNode }) {
@@ -17,7 +19,17 @@ export default async function ShopLayout({ children }: { children: React.ReactNo
   return (
     <div className="flex min-h-screen flex-col">
       <ShopHeader loggedIn={!!profile} cartCount={cartCount} />
+      <Image
+        src="/hero.jpeg"
+        alt="نبع مكيون — نقاء من قلب مكة، مستمد من جوار زمزم"
+        width={1080}
+        height={424}
+        sizes="100vw"
+        priority
+        className="block h-auto w-full animate-fade-in-up"
+      />
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">{children}</main>
+      <SiteFooter />
       <WhatsAppButton locale={locale} />
     </div>
   )

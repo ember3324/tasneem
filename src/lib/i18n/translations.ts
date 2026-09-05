@@ -10,7 +10,6 @@ export const translations = {
   'nav.account': 'الحساب',
   'nav.logout': 'تسجيل الخروج',
   'nav.login': 'تسجيل الدخول',
-  'nav.policies': 'السياسات',
 
   'auth.signup.title': 'أنشئ حسابك',
   'auth.signup.subtitle': 'فقط اسمك ورقم جوالك — بدون كلمة مرور.',

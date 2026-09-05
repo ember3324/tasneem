@@ -62,7 +62,7 @@ export function CartLineItem({
           <p className="truncate font-medium text-neutral-900">{name}</p>
           {unit && (
             <p className="text-xs text-neutral-500">
-              <span dir="ltr">{unit}</span>
+              <span>{unit}</span>
             </p>
           )}
           <p className="text-sm text-neutral-600">

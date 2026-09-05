@@ -29,34 +29,28 @@
 body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
-
-  /* Ocean wallpaper, washed with a light overlay (image at ~20% strength,
-     i.e. 80% transparent) so text and cards on top stay easy to read.
-     `background-size: contain` (with `background-attachment: scroll`, the
-     default) always fits the whole image within the page without cropping
-     either dimension, scrolling normally with the document — `cover` +
-     `fixed` cropped it to whatever the viewport happened to be, permanently
-     hiding most of a tall image on any page, and even plain `100% auto`
-     still clipped the bottom (where the brand mark sits) on pages shorter
-     than the image's scaled height. */
-  background-color: #eef8fb;
-  background-image:
-    linear-gradient(rgba(238, 248, 251, 0.8), rgba(238, 248, 251, 0.8)),
-    url('/ocean-bg.webp');
-  background-size: contain;
-  background-position: top center;
-  background-repeat: no-repeat;
+  background-color: #f7fafb;
   min-height: 100vh;
 }
 
-/* `background-attachment: fixed` is unreliable and can cause scroll jank on
-   mobile browsers — most phones ignore it anyway, so make it explicit and
-   let the wallpaper scroll with the page there instead. Emphasis is mobile,
-   so this path matters more than the desktop one above. */
-@media (max-width: 767px) {
-  body {
-    background-attachment: scroll;
-    background-position: top center;
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up {
+    animation: none;
   }
 }
 

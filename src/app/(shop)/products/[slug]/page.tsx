@@ -35,7 +35,7 @@ export default async function ProductPage(props: PageProps<'/products/[slug]'>) 
         <h1 className="text-2xl font-semibold text-neutral-900">{translateProductName(locale, product)}</h1>
         {product.unit && (
           <p className="mt-1 text-sm text-neutral-500">
-            <span dir="ltr">{product.unit}</span>
+            <span>{product.unit}</span>
           </p>
         )}
         {product.description && <p className="mt-4 text-neutral-700">{product.description}</p>}
