@@ -18,7 +18,9 @@ export const getAllProducts = unstable_cache(
     return data ?? []
   },
   ['all-products'],
-  { revalidate: 120 }
+  // Tagged so an admin edit can drop the cache immediately instead of
+  // leaving the shop two minutes behind.
+  { revalidate: 120, tags: ['products'] }
 )
 
 export const getProductBySlug = unstable_cache(
@@ -28,5 +30,5 @@ export const getProductBySlug = unstable_cache(
     return data ?? null
   },
   ['product-by-slug'],
-  { revalidate: 120 }
+  { revalidate: 120, tags: ['products'] }
 )

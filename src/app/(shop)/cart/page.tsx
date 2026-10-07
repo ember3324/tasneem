@@ -23,7 +23,7 @@ export default async function CartPage() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="text-2xl font-semibold text-neutral-900">{t(locale, 'cart.title')}</h1>
+      <h1 className="section-title mb-6 text-2xl">{t(locale, 'cart.title')}</h1>
       <CartItems items={items ?? []} />
     </div>
   )

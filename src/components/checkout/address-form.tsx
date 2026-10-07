@@ -11,7 +11,7 @@ import { useLocale } from '@/lib/i18n/client'
 // every render of the address form.
 const LocationPicker = dynamic(() => import('./location-picker').then((m) => m.LocationPicker), {
   ssr: false,
-  loading: () => <div className="h-80 w-full animate-pulse rounded-lg border border-neutral-200 bg-neutral-100" />,
+  loading: () => <div className="h-80 w-full animate-pulse rounded-xl border border-ocean-200 bg-ocean-50" />,
 })
 
 export function AddressForm() {
@@ -22,9 +22,9 @@ export function AddressForm() {
   if (state && 'outsideServiceArea' in state) {
     return (
       <div className="rounded-xl border border-amber-200 bg-amber-50 p-6 text-center">
-        <h2 className="text-lg font-semibold text-amber-900">{t('address.outsideTitle')}</h2>
+        <h2 className="text-lg font-bold text-amber-900">{t('address.outsideTitle')}</h2>
         <p className="mt-2 text-sm text-amber-800">{t('address.outsideBody')}</p>
-        <Link href="/cart" className="mt-4 inline-block text-sm font-medium underline">
+        <Link href="/cart" className="mt-4 inline-block text-sm font-semibold underline">
           {t('address.backToCart')}
         </Link>
       </div>
@@ -39,7 +39,7 @@ export function AddressForm() {
       <LocationPicker onChange={setCoords} />
 
       <div>
-        <label htmlFor="label" className="block text-sm font-medium text-neutral-700">
+        <label htmlFor="label" className="field-label">
           {t('address.label')}
         </label>
         <input
@@ -47,29 +47,20 @@ export function AddressForm() {
           name="label"
           type="text"
           defaultValue={t('address.labelPlaceholder')}
-          className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-neutral-500 focus:outline-none"
+          className="field"
         />
       </div>
 
       <div>
-        <label htmlFor="addressLine" className="block text-sm font-medium text-neutral-700">
+        <label htmlFor="addressLine" className="field-label">
           {t('address.details')}
         </label>
-        <input
-          id="addressLine"
-          name="addressLine"
-          type="text"
-          className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-neutral-500 focus:outline-none"
-        />
+        <input id="addressLine" name="addressLine" type="text" className="field" />
       </div>
 
       {state && 'error' in state && <p className="text-sm text-red-600">{state.error}</p>}
 
-      <button
-        type="submit"
-        disabled={pending || !coords}
-        className="w-full rounded-lg border border-ocean-400 bg-white py-2.5 text-sm font-semibold text-ocean-700 transition hover:border-ocean-500 hover:bg-ocean-50 disabled:opacity-50"
-      >
+      <button type="submit" disabled={pending || !coords} className="btn btn-primary w-full py-3 text-sm">
         {pending ? t('address.checking') : t('address.continue')}
       </button>
     </form>

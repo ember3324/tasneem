@@ -20,7 +20,7 @@ const notoSansArabic = Noto_Sans_Arabic({
 });
 
 export const metadata: Metadata = {
-  title: "التسنيم المكي",
+  title: "نبع مكيون",
   description: "مياه ومستلزمات التوصيل، توصيلة لباب بيتك.",
 };
 

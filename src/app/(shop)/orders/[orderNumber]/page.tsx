@@ -32,10 +32,10 @@ export default async function OrderDetailPage(props: PageProps<'/orders/[orderNu
 
   return (
     <div className="mx-auto max-w-lg">
-      <h1 className="text-2xl font-semibold text-neutral-900">
+      <h1 className="section-title text-2xl">
         {t(locale, 'orders.order')} <span dir="ltr">{order.order_number}</span>
       </h1>
-      <p className="mt-1 text-sm text-neutral-500">
+      <p className="mt-4 text-sm text-neutral-500">
         {t(locale, 'orders.placed')}{' '}
         <span dir="ltr">
           {new Date(order.created_at).toLocaleString(locale === 'ar' ? 'ar-SA' : 'en-SA')}
@@ -52,12 +52,12 @@ export default async function OrderDetailPage(props: PageProps<'/orders/[orderNu
             <li key={step} className="flex flex-1 flex-col items-center text-center">
               <div
                 className={`h-3 w-3 rounded-full ${
-                  i <= currentStepIndex ? 'bg-ocean-500' : 'bg-neutral-200'
+                  i <= currentStepIndex ? 'bg-accent-500' : 'bg-ocean-200'
                 }`}
               />
               <span
                 className={`mt-2 text-xs ${
-                  i <= currentStepIndex ? 'font-medium text-neutral-900' : 'text-neutral-400'
+                  i <= currentStepIndex ? 'font-bold text-brand-700' : 'text-neutral-400'
                 }`}
               >
                 {t(locale, `status.${step}`)}
@@ -67,22 +67,24 @@ export default async function OrderDetailPage(props: PageProps<'/orders/[orderNu
         </ol>
       )}
 
-      <div className="mt-8 rounded-xl border-2 border-ocean-300 bg-white p-6 shadow-sm">
-        <h2 className="text-sm font-medium text-neutral-700">{t(locale, 'orders.items')}</h2>
-        <ul className="mt-2 space-y-1 text-sm text-neutral-600">
+      <div className="surface mt-8 p-6">
+        <h2 className="text-sm font-bold text-brand-700">{t(locale, 'orders.items')}</h2>
+        <ul className="mt-2 divide-y divide-ocean-100 text-sm text-neutral-600">
           {(items ?? []).map((item) => (
-            <li key={item.id} className="flex justify-between gap-3">
+            <li key={item.id} className="flex justify-between gap-3 py-2">
               <span className="min-w-0">
                 <span dir="ltr">{item.quantity}x</span> {item.product_name}
               </span>
-              <span dir="ltr" className="shrink-0">{item.line_total.toFixed(2)} SAR</span>
+              <span dir="ltr" className="shrink-0">{item.line_total.toFixed(2)} ر.س</span>
             </li>
           ))}
         </ul>
 
-        <div className="mt-4 flex justify-between border-t border-neutral-200 pt-4 text-base font-semibold text-neutral-900">
-          <span>{t(locale, 'orders.total')}</span>
-          <span dir="ltr">{order.total_amount.toFixed(2)} SAR</span>
+        <div className="mt-4 flex items-center justify-between rounded-xl bg-brand-50/70 px-4 py-3">
+          <span className="text-sm font-bold text-brand-700">{t(locale, 'orders.total')}</span>
+          <span dir="ltr" className="text-xl font-extrabold text-accent-600">
+            {order.total_amount.toFixed(2)} ر.س
+          </span>
         </div>
 
         <dl className="mt-4 space-y-1 text-sm text-neutral-600">
@@ -101,8 +103,8 @@ export default async function OrderDetailPage(props: PageProps<'/orders/[orderNu
 
         {order.status === 'completed' && order.proof_photo_url && (
           <div className="mt-4">
-            <h2 className="text-sm font-medium text-neutral-700">{t(locale, 'orders.deliveryProof')}</h2>
-            <div className="relative mt-2 h-64 w-full overflow-hidden rounded-lg border border-neutral-200">
+            <h2 className="text-sm font-bold text-brand-700">{t(locale, 'orders.deliveryProof')}</h2>
+            <div className="relative mt-2 h-64 w-full overflow-hidden rounded-xl border border-ocean-200">
               <Image
                 src={order.proof_photo_url}
                 alt={t(locale, 'orders.deliveryProof')}

@@ -18,8 +18,8 @@ export default async function AccountPage() {
   return (
     <div className="mx-auto max-w-lg space-y-8">
       <section>
-        <h1 className="text-2xl font-semibold text-neutral-900">{t(locale, 'account.title')}</h1>
-        <div className="mt-4 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <h1 className="section-title text-2xl">{t(locale, 'account.title')}</h1>
+        <div className="surface mt-6 p-6">
           <dl className="space-y-2 text-sm">
             <div className="flex justify-between">
               <dt className="text-neutral-500">{t(locale, 'account.name')}</dt>
@@ -34,7 +34,7 @@ export default async function AccountPage() {
       </section>
 
       <section>
-        <h2 className="text-lg font-semibold text-neutral-900">{t(locale, 'account.savedAddresses')}</h2>
+        <h2 className="section-title text-lg">{t(locale, 'account.savedAddresses')}</h2>
         {(!addresses || addresses.length === 0) ? (
           <p className="mt-2 text-sm text-neutral-500">{t(locale, 'account.noAddresses')}</p>
         ) : (

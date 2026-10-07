@@ -6,6 +6,9 @@ import { useLocale } from '@/lib/i18n/client'
 
 const MAX_QUANTITY = 99999
 
+const STEP_BUTTON =
+  'flex h-8 w-8 items-center justify-center text-base font-bold text-brand-600 transition hover:bg-brand-50'
+
 export function CartLineItem({
   name,
   unit,
@@ -53,27 +56,23 @@ export function CartLineItem({
   }
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-neutral-100 py-4 last:border-0">
+    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-ocean-100 py-4 last:border-0">
       <div className="flex min-w-0 items-center gap-3">
-        <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-neutral-100">
-          {imageUrl && <Image src={imageUrl} alt={name} fill sizes="56px" className="object-contain" />}
+        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-ocean-100 bg-gradient-to-b from-brand-50/60 to-white">
+          {imageUrl && <Image src={imageUrl} alt={name} fill sizes="64px" className="object-contain p-1.5" />}
         </div>
         <div className="min-w-0">
-          <p className="truncate font-medium text-neutral-900">{name}</p>
-          {unit && (
-            <p className="text-xs text-neutral-500">
-              <span>{unit}</span>
-            </p>
-          )}
-          <p className="text-sm text-neutral-600">
-            <span dir="ltr">{price.toFixed(2)} SAR</span>
+          <p className="truncate text-sm font-bold text-neutral-800">{name}</p>
+          {unit && <p className="text-xs text-neutral-500">{unit}</p>}
+          <p dir="ltr" className="mt-0.5 text-sm font-semibold text-accent-600">
+            {price.toFixed(2)} ر.س
           </p>
         </div>
       </div>
 
       <div className="flex items-center gap-3">
-        <div className="flex items-center rounded-lg border border-neutral-300">
-          <button type="button" className="px-3 py-1 text-neutral-600 hover:text-neutral-900" onClick={onDecrement}>
+        <div className="flex items-center overflow-hidden rounded-xl border border-ocean-200 bg-white">
+          <button type="button" aria-label="−" className={STEP_BUTTON} onClick={onDecrement}>
             −
           </button>
           <input
@@ -91,15 +90,22 @@ export function CartLineItem({
                 e.currentTarget.blur()
               }
             }}
-            className="w-14 rounded bg-transparent text-center text-sm focus:outline-none focus:ring-1 focus:ring-ocean-400"
+            className="w-12 border-x border-ocean-100 bg-transparent py-1.5 text-center text-sm font-semibold focus:outline-none"
           />
-          <button type="button" className="px-3 py-1 text-neutral-600 hover:text-neutral-900" onClick={onIncrement}>
+          <button type="button" aria-label="+" className={STEP_BUTTON} onClick={onIncrement}>
             +
           </button>
         </div>
 
-        <button type="button" onClick={onRemove} className="text-sm text-neutral-400 hover:text-red-600">
-          {t('cart.remove')}
+        <button
+          type="button"
+          onClick={onRemove}
+          aria-label={t('cart.remove')}
+          className="flex h-8 w-8 items-center justify-center rounded-lg text-neutral-400 transition hover:bg-red-50 hover:text-red-600"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
+          </svg>
         </button>
       </div>
     </div>

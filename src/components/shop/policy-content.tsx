@@ -7,7 +7,7 @@ export function PolicyContent({ blocks }: { blocks: PolicyBlock[] }) {
         switch (block.type) {
           case 'heading':
             return (
-              <h2 key={i} className="pt-2 text-base font-semibold text-neutral-900">
+              <h2 key={i} className="pt-2 text-base font-bold text-brand-700">
                 {block.text}
               </h2>
             )

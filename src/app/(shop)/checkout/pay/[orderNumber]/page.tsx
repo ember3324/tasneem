@@ -31,14 +31,14 @@ export default async function CheckoutPayPage(props: PageProps<'/checkout/pay/[o
 
   return (
     <div className="mx-auto max-w-md">
-      <h1 className="text-2xl font-semibold text-neutral-900">
-        {t(locale, 'checkout.pay.heading')} <span dir="ltr">{order.total_amount.toFixed(2)} SAR</span>
+      <h1 className="section-title text-2xl">
+        {t(locale, 'checkout.pay.heading')} <span dir="ltr">{order.total_amount.toFixed(2)} ر.س</span>
       </h1>
-      <p className="mt-1 text-sm text-neutral-500">
+      <p className="mt-4 text-sm text-neutral-500">
         {t(locale, 'checkout.pay.order')} <span dir="ltr">{order.order_number}</span>
       </p>
 
-      <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+      <div className="surface mt-6 p-6">
         <MoyasarCardForm
           orderNumber={order.order_number}
           amountSar={order.total_amount}

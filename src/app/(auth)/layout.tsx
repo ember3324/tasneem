@@ -5,11 +5,12 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
   const locale = await getLocale()
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
+    <div className="flex min-h-screen flex-col items-center justify-center px-4 py-10">
+      <a href="/categories" className="mb-6 text-2xl font-extrabold text-brand-700">
+        نبع مكيون
+      </a>
       <div className="w-full max-w-sm">
-        <div className="rounded-2xl border-2 border-ocean-300 bg-white p-8 shadow-sm">
-          {children}
-        </div>
+        <div className="surface p-8">{children}</div>
       </div>
       <WhatsAppButton locale={locale} />
     </div>

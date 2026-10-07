@@ -46,18 +46,22 @@ export function CartItems({ items }: { items: CartRow[] }) {
 
   if (optimisticItems.length === 0) {
     return (
-      <p className="mt-6 text-sm text-neutral-500">
-        {t('cart.empty')}{' '}
-        <Link href="/categories" className="underline">
+      <div className="surface mt-6 flex flex-col items-center gap-3 p-10 text-center">
+        <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-50 text-brand-500">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M3 4h2l2.4 12.2a2 2 0 002 1.8h7.2a2 2 0 002-2L20 8H6M9 21a1 1 0 100-2 1 1 0 000 2zm8 0a1 1 0 100-2 1 1 0 000 2z" />
+          </svg>
+        </span>
+        <p className="text-sm text-neutral-500">{t('cart.empty')}</p>
+        <Link href="/categories" className="btn btn-primary px-5 py-2.5 text-sm">
           {t('cart.startShopping')}
         </Link>
-        .
-      </p>
+      </div>
     )
   }
 
   return (
-    <div className="mt-6 rounded-xl border-2 border-ocean-300 bg-white p-4 shadow-sm">
+    <div className="surface mt-6 p-4 sm:p-6">
       {optimisticItems.map((item) => (
         <CartLineItem
           key={item.id}
@@ -73,17 +77,14 @@ export function CartItems({ items }: { items: CartRow[] }) {
         />
       ))}
 
-      <div className="mt-4 flex items-center justify-between border-t border-neutral-200 pt-4">
-        <span className="font-medium text-neutral-900">{t('cart.total')}</span>
-        <span dir="ltr" className="text-lg font-semibold text-neutral-900">
-          {total.toFixed(2)} SAR
+      <div className="mt-4 flex items-center justify-between rounded-xl bg-brand-50/70 px-4 py-3">
+        <span className="text-sm font-bold text-brand-700">{t('cart.total')}</span>
+        <span dir="ltr" className="text-xl font-extrabold text-accent-600">
+          {total.toFixed(2)} ر.س
         </span>
       </div>
 
-      <Link
-        href="/checkout/address"
-        className="mt-4 block w-full rounded-lg border border-ocean-400 bg-white py-2.5 text-center text-sm font-semibold text-ocean-700 transition hover:border-ocean-500 hover:bg-ocean-50"
-      >
+      <Link href="/checkout/address" className="btn btn-primary mt-4 w-full py-3 text-sm">
         {t('cart.checkout')}
       </Link>
     </div>

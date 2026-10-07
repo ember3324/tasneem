@@ -22,41 +22,45 @@ export default async function CheckoutAddressPage() {
 
   return (
     <div className="mx-auto max-w-lg">
-      <h1 className="text-2xl font-semibold text-neutral-900">{t(locale, 'address.title')}</h1>
-      <p className="mt-1 text-sm text-neutral-500">{t(locale, 'address.subtitle')}</p>
+      <h1 className="section-title text-2xl">{t(locale, 'address.title')}</h1>
+      <p className="mt-4 text-sm text-neutral-500">{t(locale, 'address.subtitle')}</p>
 
       {savedAddresses.length > 0 && (
         <div className="mt-6 space-y-3">
-          <h2 className="text-sm font-medium text-neutral-700">{t(locale, 'address.chooseAddress')}</h2>
+          <h2 className="text-sm font-bold text-brand-700">{t(locale, 'address.chooseAddress')}</h2>
           {savedAddresses.map((address) => (
-            <div
-              key={address.id}
-              className="flex items-start justify-between gap-4 rounded-xl border border-ocean-200 bg-white p-4 shadow-sm"
-            >
-              <div className="min-w-0">
-                <p className="font-medium text-neutral-900">{address.label}</p>
-                <p className="text-sm text-neutral-500">
-                  {[address.address_line, address.city].filter(Boolean).join(', ')}
-                </p>
+            <div key={address.id} className="surface surface-hover flex items-center justify-between gap-4 p-4">
+              <div className="flex min-w-0 gap-3">
+                <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M12 21s7-5.5 7-11a7 7 0 10-14 0c0 5.5 7 11 7 11z" />
+                    <circle cx="12" cy="10" r="2.5" />
+                  </svg>
+                </span>
+                <div className="min-w-0">
+                  <p className="text-sm font-bold text-neutral-800">{address.label}</p>
+                  <p className="text-sm text-neutral-500">
+                    {[address.address_line, address.city].filter(Boolean).join(', ')}
+                  </p>
+                </div>
               </div>
               {address.in_service_area ? (
-                <Link
-                  href={`/checkout?address=${address.id}`}
-                  className="shrink-0 rounded-lg border border-ocean-400 bg-white px-3 py-1.5 text-sm font-semibold text-ocean-700 transition hover:border-ocean-500 hover:bg-ocean-50"
-                >
+                <Link href={`/checkout?address=${address.id}`} className="btn btn-primary shrink-0 px-4 py-2 text-xs">
                   {t(locale, 'address.deliverHere')}
                 </Link>
               ) : (
-                <span className="shrink-0 text-xs text-neutral-400">{t(locale, 'account.outsideArea')}</span>
+                <span className="shrink-0 rounded-full bg-neutral-100 px-2 py-0.5 text-[11px] font-semibold text-neutral-500">
+                  {t(locale, 'account.outsideArea')}
+                </span>
               )}
             </div>
           ))}
         </div>
       )}
 
-      <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+      <div className="surface mt-6 p-6">
         {savedAddresses.length > 0 && (
-          <h2 className="mb-4 text-sm font-medium text-neutral-700">{t(locale, 'address.addNew')}</h2>
+          <h2 className="mb-4 text-sm font-bold text-brand-700">{t(locale, 'address.addNew')}</h2>
         )}
         <AddressForm />
       </div>

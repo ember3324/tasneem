@@ -32,29 +32,33 @@ export default async function CheckoutPage(props: PageProps<'/checkout'>) {
 
   return (
     <div className="mx-auto max-w-lg">
-      <h1 className="text-2xl font-semibold text-neutral-900">{t(locale, 'checkout.title')}</h1>
+      <h1 className="section-title text-2xl">{t(locale, 'checkout.title')}</h1>
 
-      <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
-        <h2 className="text-sm font-medium text-neutral-700">{t(locale, 'checkout.deliveringTo')}</h2>
+      <div className="surface mt-8 p-6">
+        <h2 className="text-sm font-bold text-brand-700">{t(locale, 'checkout.deliveringTo')}</h2>
         <p className="mt-1 text-sm text-neutral-600">
           {[address.address_line, address.city].filter(Boolean).join(', ')}
         </p>
 
-        <h2 className="mt-4 text-sm font-medium text-neutral-700">{t(locale, 'checkout.items')}</h2>
-        <ul className="mt-1 space-y-1 text-sm text-neutral-600">
+        <h2 className="mt-6 text-sm font-bold text-brand-700">{t(locale, 'checkout.items')}</h2>
+        <ul className="mt-2 divide-y divide-ocean-100 text-sm text-neutral-600">
           {cartItems.map((item) => (
-            <li key={item.id} className="flex justify-between">
+            <li key={item.id} className="flex justify-between py-2">
               <span>
-                {item.quantity}x {item.product.name}
+                {item.quantity}× {item.product.name}
               </span>
-              <span dir="ltr">{(item.product.price * item.quantity).toFixed(2)} SAR</span>
+              <span dir="ltr" className="font-semibold text-neutral-700">
+                {(item.product.price * item.quantity).toFixed(2)} ر.س
+              </span>
             </li>
           ))}
         </ul>
 
-        <div className="mt-4 flex justify-between border-t border-neutral-200 pt-4 text-base font-semibold text-neutral-900">
-          <span>{t(locale, 'checkout.total')}</span>
-          <span dir="ltr">{total.toFixed(2)} SAR</span>
+        <div className="mt-4 flex items-center justify-between rounded-xl bg-brand-50/70 px-4 py-3">
+          <span className="text-sm font-bold text-brand-700">{t(locale, 'checkout.total')}</span>
+          <span dir="ltr" className="text-xl font-extrabold text-accent-600">
+            {total.toFixed(2)} ر.س
+          </span>
         </div>
 
         <div className="mt-6">

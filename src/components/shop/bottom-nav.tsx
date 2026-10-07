@@ -37,7 +37,7 @@ function NavItem({
     <Link
       href={href}
       className={`flex flex-1 flex-col items-center justify-center gap-0.5 rounded-xl py-2 text-[11px] font-medium transition ${
-        active ? 'bg-brand-600 text-white shadow-sm' : 'text-neutral-500 hover:text-brand-600'
+        active ? 'bg-brand-700 text-white shadow-sm' : 'text-neutral-500 hover:text-brand-600'
       }`}
     >
       <Icon d={ICONS[icon]} />
@@ -59,19 +59,12 @@ export function BottomNav({
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 rounded-t-2xl border-t border-ocean-200 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] backdrop-blur-md"
-      style={{
-        // Same "image over a solid base" technique as the header, at the
-        // same visible strength, so scrolled content underneath this fixed
-        // bar never bleeds through.
-        backgroundColor: '#ffffff',
-        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.4)), url(/footerbg.jpeg)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-      }}
+      className="fixed inset-x-0 bottom-0 z-40 px-4 md:hidden"
+      style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom, 0px))' }}
     >
-      <div className="mx-auto flex max-w-5xl items-stretch gap-1 p-1.5">
+      {/* Floating pill rather than a full-width bar, matching the brand
+          layout; the solid white keeps scrolled content from showing through. */}
+      <div className="mx-auto flex max-w-md items-stretch gap-1 rounded-2xl border border-ocean-100 bg-white p-1.5 shadow-[0_8px_30px_-8px_rgba(23,56,107,0.35)]">
         <NavItem href="/categories" active={pathname === '/categories'} icon="shop" label={t('nav.shop')} />
         {loggedIn && (
           <NavItem href="/orders" active={pathname.startsWith('/orders')} icon="orders" label={t('nav.orders')} />

@@ -13,14 +13,14 @@ function SignupForm() {
 
   return (
     <div>
-      <h1 className="text-xl font-semibold text-neutral-900">{t('auth.signup.title')}</h1>
-      <p className="mt-1 text-sm text-neutral-500">{t('auth.signup.subtitle')}</p>
+      <h1 className="section-title text-xl">{t('auth.signup.title')}</h1>
+      <p className="mt-3 text-sm text-neutral-500">{t('auth.signup.subtitle')}</p>
 
       <form action={formAction} className="mt-6 space-y-4">
         <input type="hidden" name="next" value={next} />
 
         <div>
-          <label htmlFor="fullName" className="block text-sm font-medium text-neutral-700">
+          <label htmlFor="fullName" className="field-label">
             {t('auth.fullName')}
           </label>
           <input
@@ -29,12 +29,12 @@ function SignupForm() {
             type="text"
             required
             autoComplete="name"
-            className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-neutral-500 focus:outline-none"
+            className="field"
           />
         </div>
 
         <div>
-          <label htmlFor="phone" className="block text-sm font-medium text-neutral-700">
+          <label htmlFor="phone" className="field-label">
             {t('auth.mobileNumber')}
           </label>
           <input
@@ -44,7 +44,7 @@ function SignupForm() {
             placeholder="05XXXXXXXX"
             required
             autoComplete="tel"
-            className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-neutral-500 focus:outline-none"
+            className="field"
           />
         </div>
 
@@ -53,7 +53,7 @@ function SignupForm() {
         <button
           type="submit"
           disabled={pending}
-          className="w-full rounded-lg border border-ocean-400 bg-white py-2.5 text-sm font-semibold text-ocean-700 transition hover:border-ocean-500 hover:bg-ocean-50 disabled:opacity-50"
+          className="btn btn-primary w-full py-3 text-sm"
         >
           {pending ? t('auth.signup.submitting') : t('auth.signup.submit')}
         </button>
@@ -61,7 +61,7 @@ function SignupForm() {
 
       <p className="mt-6 text-center text-sm text-neutral-500">
         {t('auth.signup.haveAccount')}{' '}
-        <Link href="/login" className="font-medium text-neutral-900 underline">
+        <Link href="/login" className="font-semibold text-brand-600 underline">
           {t('nav.login')}
         </Link>
       </p>
