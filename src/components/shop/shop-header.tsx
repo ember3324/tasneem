@@ -1,10 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { Suspense } from 'react'
 import { usePathname } from 'next/navigation'
 import { BrandMark } from './brand-mark'
-import { SearchBox } from './search-box'
 
 const WHATSAPP_NUMBER = '966590300780'
 
@@ -34,14 +32,14 @@ export function ShopHeader({
 
   return (
     <header className="sticky z-40 shadow-sm" style={{ top: 'env(safe-area-inset-top, 0px)' }}>
-      {/* Promise strip. Decorative on a phone, where it would eat the top
-          of every screen, so it starts at the small breakpoint. */}
-      <div className="hidden bg-brand-700 text-white sm:block">
-        <div className="mx-auto flex max-w-7xl items-center justify-center gap-6 px-4 py-2 text-[11px] font-bold lg:gap-10 lg:text-xs">
+      {/* Promise strip. On a phone the three promises wrap onto two tight
+          rows rather than being dropped. */}
+      <div className="bg-brand-700 text-white">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-4 gap-y-1 px-3 py-1.5 text-[10px] font-bold sm:gap-6 sm:px-4 sm:py-2 sm:text-[11px] lg:gap-10 lg:text-xs">
           {PROMISES.map((promise, i) => (
-            <span key={promise.label} className="flex items-center gap-2">
-              {i > 0 && <span aria-hidden="true" className="me-4 h-4 w-px bg-white/25" />}
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <span key={promise.label} className="flex items-center gap-1.5 sm:gap-2">
+              {i > 0 && <span aria-hidden="true" className="me-4 hidden h-4 w-px bg-white/25 sm:block" />}
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d={promise.icon} />
               </svg>
               {promise.label}
@@ -82,10 +80,6 @@ export function ShopHeader({
           </Link>
 
           <div className="flex flex-1 items-center justify-end gap-3">
-            <Suspense fallback={null}>
-              <SearchBox className="hidden w-full max-w-sm md:block" />
-            </Suspense>
-
             <Link
               href={loggedIn ? '/account' : '/login'}
               className="hidden shrink-0 items-center gap-2 whitespace-nowrap rounded-full bg-brand-700 py-1.5 pe-5 ps-1.5 text-sm font-bold text-white transition hover:bg-brand-600 sm:flex"
@@ -111,13 +105,6 @@ export function ShopHeader({
               </span>
             </Link>
           </div>
-        </div>
-
-        {/* Phones get the search on its own row, where there is room for it. */}
-        <div className="mx-auto max-w-7xl px-4 pb-3 md:hidden">
-          <Suspense fallback={null}>
-            <SearchBox />
-          </Suspense>
         </div>
       </div>
     </header>
