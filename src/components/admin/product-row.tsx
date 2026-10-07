@@ -110,6 +110,13 @@ export function ProductRow({ product }: { product: Product | null }) {
           />
         </div>
 
+        <div className="sm:col-span-2">
+          <p className="text-xs text-neutral-500">
+            أزل علامة «ظاهر في المتجر» لإخفاء المنتج من الصفحة الرئيسية بدون حذفه — يبقى محفوظًا
+            وسجل طلباته سليم، وترجعه متى ما حبيت.
+          </p>
+        </div>
+
         <div className="flex items-center gap-4">
           <label className="flex items-center gap-2 text-sm font-bold text-neutral-700">
             <input
@@ -118,7 +125,7 @@ export function ProductRow({ product }: { product: Product | null }) {
               defaultChecked={product?.in_stock ?? true}
               className="h-4 w-4 accent-brand-600"
             />
-            متوفر للبيع
+            ظاهر في المتجر
           </label>
 
           <label className="flex items-center gap-2 text-sm font-bold text-neutral-700">

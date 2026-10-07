@@ -1,5 +1,11 @@
 # Setup guide
 
+> This is the from-scratch account setup guide. Two parts are outdated: the
+> shop no longer uses categories (the seed data in `0001_init.sql` was
+> replaced by the real products), and the order-sync schedule now runs from
+> cron-job.org, not the GitHub Actions workflow in §4. See `README.md` for the
+> current state of the project.
+
 This project is code-complete for the core flows (signup, service-area check,
 shop/cart/checkout, Moyasar payment, order tracking, Google Sheets admin
 sync) but needs real accounts wired up before it does anything live. None of
