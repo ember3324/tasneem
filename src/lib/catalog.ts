@@ -9,12 +9,19 @@ import type { Product } from '@/lib/types'
 // user-specific.
 
 // The shop lists every product directly with no category-picking step, so
-// this pulls everything in one flat, sort_order-ranked list rather than
-// scoping to a category.
+// this pulls one flat, sort_order-ranked list rather than scoping to a
+// category. Only products marked as shown appear: a product that is tied to
+// past orders cannot be deleted (the order history points at it), so
+// unticking it in the admin page is how it leaves the shop.
 export const getAllProducts = unstable_cache(
   async (): Promise<Product[]> => {
     const admin = createAdminClient()
-    const { data } = await admin.from('products').select('*').order('sort_order').returns<Product[]>()
+    const { data } = await admin
+      .from('products')
+      .select('*')
+      .eq('in_stock', true)
+      .order('sort_order')
+      .returns<Product[]>()
     return data ?? []
   },
   ['all-products'],
