@@ -87,7 +87,7 @@ export default async function ShopPage(props: PageProps<'/categories'>) {
             <div
               key={product.id}
               style={{ animationDelay: `${i * 40}ms` }}
-              className="surface surface-hover animate-fade-in-up relative flex w-[calc(50%-0.5rem)] max-w-[320px] flex-col overflow-hidden lg:w-[calc(25%-0.75rem)]"
+              className="surface surface-hover animate-fade-in-up relative flex w-full flex-col overflow-hidden sm:w-[calc(33.333%-0.667rem)]"
             >
               {/* The catalog is sorted by sort_order, so the first card is the
                   one the owner put at the top — but the badge only means
@@ -98,14 +98,14 @@ export default async function ShopPage(props: PageProps<'/categories'>) {
                 </span>
               )}
 
-              <Link href={`/products/${product.slug}`} className="relative block aspect-square w-full bg-white">
+              <Link href={`/products/${product.slug}`} className="relative block aspect-[3/2] w-full bg-white">
                 {product.image_url && (
                   <Image
                     src={product.image_url}
                     alt={translateProductName(locale, product)}
                     fill
-                    sizes="(max-width: 640px) 50vw, 25vw"
-                    className="object-contain p-4"
+                    sizes="(max-width: 640px) 100vw, 33vw"
+                    className="object-contain p-2"
                   />
                 )}
               </Link>
