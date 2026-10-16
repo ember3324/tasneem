@@ -50,8 +50,8 @@ export function ShopHeader({
 
       <div className="border-b border-ocean-100 bg-white">
         <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3">
-          {/* Navigation on the start side; the floating bottom bar covers
-              this on phones. */}
+          {/* Navigation on the start side; on smaller screens the same links
+              are in the footer. */}
           <nav className="hidden flex-1 items-center gap-6 lg:flex">
             <Link href="/categories" className="nav-link" data-active={pathname === '/categories'}>
               الرئيسية
@@ -82,14 +82,16 @@ export function ShopHeader({
           <div className="flex flex-1 items-center justify-end gap-3">
             <Link
               href={loggedIn ? '/account' : '/login'}
-              className="hidden shrink-0 items-center gap-2 whitespace-nowrap rounded-full bg-brand-700 py-1.5 pe-5 ps-1.5 text-sm font-bold text-white transition hover:bg-brand-600 sm:flex"
+              aria-label={loggedIn ? 'حسابي' : 'تسجيل الدخول'}
+              className="flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full bg-brand-700 p-1.5 text-sm font-bold text-white transition hover:bg-brand-600 sm:pe-5"
             >
               <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/15">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d="M12 12a4 4 0 100-8 4 4 0 000 8zm-7 8c0-3.3 3.1-6 7-6s7 2.7 7 6" />
                 </svg>
               </span>
-              {loggedIn ? 'حسابي' : 'تسجيل الدخول'}
+              {/* Icon-only on phones, where there is no room for the label. */}
+              <span className="hidden sm:inline">{loggedIn ? 'حسابي' : 'تسجيل الدخول'}</span>
             </Link>
 
             <Link

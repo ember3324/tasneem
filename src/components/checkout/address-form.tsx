@@ -17,7 +17,21 @@ const LocationPicker = dynamic(() => import('./location-picker').then((m) => m.L
 export function AddressForm() {
   const [state, formAction, pending] = useActionState(saveAddressAndCheckServiceArea, null)
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null)
+  const [addressLine, setAddressLine] = useState('')
+  const [autoLine, setAutoLine] = useState('')
   const { t } = useLocale()
+
+  // Choosing a mosque on the map fills the address note with its name — but
+  // never over something the customer typed themselves.
+  function handleLocation(next: { lat: number; lng: number }, place?: { name: string }) {
+    setCoords(next)
+    if (!place) return
+    const line = `${t('address.nextTo')} ${place.name}`
+    if (addressLine === '' || addressLine === autoLine) {
+      setAddressLine(line)
+      setAutoLine(line)
+    }
+  }
 
   if (state && 'outsideServiceArea' in state) {
     return (
@@ -36,7 +50,7 @@ export function AddressForm() {
       <input type="hidden" name="lat" value={coords?.lat ?? ''} />
       <input type="hidden" name="lng" value={coords?.lng ?? ''} />
 
-      <LocationPicker onChange={setCoords} />
+      <LocationPicker onChange={handleLocation} />
 
       <div>
         <label htmlFor="label" className="field-label">
@@ -55,7 +69,14 @@ export function AddressForm() {
         <label htmlFor="addressLine" className="field-label">
           {t('address.details')}
         </label>
-        <input id="addressLine" name="addressLine" type="text" className="field" />
+        <input
+          id="addressLine"
+          name="addressLine"
+          type="text"
+          value={addressLine}
+          onChange={(e) => setAddressLine(e.target.value)}
+          className="field"
+        />
       </div>
 
       {state && 'error' in state && <p className="text-sm text-red-600">{state.error}</p>}

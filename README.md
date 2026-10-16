@@ -179,6 +179,11 @@ orders don't require tapping "+" repeatedly.
   Mosque) or use "my location". `saveAddressAndCheckServiceArea` stores the address with
   `in_service_area` computed by `isWithinServiceArea` (`src/lib/geo.ts`: turf
   `booleanPointInPolygon` against every `service_zones` row where `active = true`).
+- The map also shows ~790 mosques as tappable green badges (from zoom 12); tapping one puts the
+  pin there and fills the address note with "بجانب <name>". They come from the static file
+  `public/data/mosques.geojson` (OpenStreetMap via Overpass, ODbL — the basemap attribution
+  already credits OSM), regenerated with `node scripts/update-mosques.mjs`. A static file was
+  chosen over Mapbox Search so panning the map never costs API requests.
 - Saved addresses are listed first at `/checkout/address` with a "deliver here" button, so
   repeat customers skip the map. Out-of-area addresses show their status instead.
 - The check runs **twice**: when the address is saved, and again in `createOrder` against the
@@ -252,11 +257,18 @@ Order `status` is never touched by payment (the Sheet owns it). Card orders are 
 published to the Sheet/Telegram once paid, via `publishOrder()` in `src/lib/order-publish.ts`
 (idempotent: callback and webhook can both call it); cash orders publish at checkout.
 Amounts are converted SAR → halalas (`toHalalas`). Without `NEXT_PUBLIC_MOYASAR_PUBLISHABLE_KEY`
-the pay page shows an English "Payments are not configured yet" message.
+the pay page shows an Arabic "online payment unavailable" message.
+
+The webhook re-checks amount and currency against the order before marking it paid (the
+amount is chosen in the customer's browser, so the shared secret alone is not enough).
+Refunds are made by hand in the Moyasar dashboard; the `payment_refunded` webhook calls
+`recordRefund()` (`src/lib/order-refund.ts`), which sets `payment_status` to `refunded` /
+`partially_refunded`, rewrites the Sheet's Payment Type cell and sends the owner a Telegram
+message. A refund does not change the order `status` — cancel it in the Sheet if needed.
 
 Keys: `.env.local` and Vercel hold the **live** keys (`pk_live_`/`sk_live_`); the test keys are
 kept as comments in `.env.local` for switching back. One webhook is registered in Moyasar
-(`/api/payments/webhook`, events `payment_paid` + `payment_failed`) and covers both modes.
+(`/api/payments/webhook`, events `payment_paid`, `payment_failed`, `payment_refunded`) and covers both modes.
 Apple Pay runs through the same form (`methods: ['applepay', 'creditcard']`) using Moyasar's
 web registration — no Apple Developer account. The domain is registered under Settings →
 Apple Pay - Domains in the Moyasar dashboard, and the verification file lives at
@@ -288,7 +300,7 @@ copy the new text into `policies.ts`. The footer links to all three.
 
 ## 6. Data model
 
-Defined in `supabase/migrations/0001_init.sql` (+ `0002`). Both are applied to the live DB.
+Defined in `supabase/migrations/0001_init.sql` (+ `0002`, `0003`). `0001`/`0002` are applied to the live DB; **`0003` (refund statuses) must be run in the Supabase SQL editor** — until then refunds are logged but not recorded.
 New schema changes = a new numbered migration file, run in the Supabase SQL editor.
 
 | Table | Key columns | Notes |
@@ -299,7 +311,7 @@ New schema changes = a new numbered migration file, run in the Supabase SQL edit
 | `categories` | `name`, `slug`, `sort_order` | One hidden row; see §5.2. |
 | `products` | `category_id` (NOT NULL), `name`, `slug`, `price`, `unit`, `image_url`, `in_stock`, `sort_order`, `description` | Public-read. `in_stock=false` shows "out of stock" instead of the button. |
 | `cart_items` | `user_id`, `product_id`, `quantity > 0`, unique pair | |
-| `orders` | `order_number` (unique), `user_id`, `address_id` (nullable), denormalised customer/location/items/total, `payment_method` (`cash`/`card`), `payment_status` (`pending`/`paid`/`failed`/`cod_pending`), `status`, `proof_photo_url`, `moyasar_payment_id`, `sheet_row_number`, `sheet_synced_at` | |
+| `orders` | `order_number` (unique), `user_id`, `address_id` (nullable), denormalised customer/location/items/total, `payment_method` (`cash`/`card`), `payment_status` (`pending`/`paid`/`failed`/`cod_pending`/`refunded`/`partially_refunded`), `status`, `proof_photo_url`, `moyasar_payment_id`, `sheet_row_number`, `sheet_synced_at` | |
 | `order_items` | `order_id` (cascade), snapshot `product_name`, `unit_price`, `quantity`, `line_total` | |
 | `order_status_history` | `order_id`, `status`, `changed_at` | Filled by the `on_order_status_change` trigger. |
 
@@ -340,7 +352,7 @@ migration file was intentionally left as the historical schema.
 
 - **Arabic only.** All strings are keys in `src/lib/i18n/translations.ts` (flat dictionary,
   grouped `nav.`, `shop.`, `cart.`, `checkout.`, `address.`, `account.`, `orders.`, `status.`,
-  `auth.`, `whatsapp.`). `getLocale()` always returns `'ar'`; the `t(locale, key)` /
+  `auth.`). `getLocale()` always returns `'ar'`; the `t(locale, key)` /
   `useLocale()` plumbing is kept so a second language could be reintroduced. Root layout sets
   `<html lang="ar" dir="rtl">`.
 - **Bidi pitfall (cost us two bugs):** never put `dir="ltr"` on a container that has Arabic
@@ -351,15 +363,15 @@ migration file was intentionally left as the historical schema.
   borders and bevels; `brand-400…700` is a more vivid blue reserved for CTAs and the active
   nav pill, so primary actions pop. Body background `#f7fafb`.
 - **Layout** (`src/app/(shop)/layout.tsx`): a flex column with a sticky-footer pattern —
-  static header (scrolls away) → hero card → `<main>` → site footer → fixed bottom nav
-  (`pb-16` reserves its space) → floating WhatsApp button (`bottom-20`, above the nav).
-- **Header / bottom nav / footer backgrounds** (`headerbg.jpeg`, `footerbg.jpeg`): solid white
+  sticky header → `<main>` → **one** site footer. There is no fixed bottom bar and no floating
+  WhatsApp button any more: the footer carries the account links (orders / account + logout, or login;
+  shop and cart stay in the header), policies, the WhatsApp button with the Saudi Business Center
+  logo beside it, and the commercial-registration number. It is kept compact on phones. On phones the header shows an icon-only account
+  button next to the cart.
+- **Header / footer backgrounds** (`headerbg.jpeg`, `footerbg.jpeg`): solid white
   base + a translucent white gradient over the image (≈60% image visibility) with
   `cover`/`center`. Use that technique rather than plain `opacity`, so scrolled content never
-  bleeds through the fixed nav.
-- **Bottom nav** (`bottom-nav.tsx`): shop / orders (logged in) / cart (with count) /
-  account + logout, or login. Active tab = filled `brand-600` pill with white text; inactive =
-  neutral icon + label.
+  bleeds through.
 - **Hero**: `public/hero.jpeg` in a bordered rounded card, centred at 78% width.
 - **Product cards**: two per row at every width, `rounded-xl bg-white shadow-md`, square image
   with `object-contain` (always show the whole picture — never crop products), centred stack
@@ -383,7 +395,7 @@ src/
     admin/zones/          delivery-zone polygon editor (+ admin layout guard)
     api/                  cron/sync-sheet, payments/{link,callback,webhook}
   components/
-    shop/                 shop-header, bottom-nav, site-footer, whatsapp-button, add-to-cart-button,
+    shop/                 shop-header, site-footer, add-to-cart-button,
                           cart-items, cart-line-item, address-card, policy-content
     checkout/             address-form, checkout-form, location-picker, moyasar-card-form
     admin/                zone-map-editor, zone-list-item
@@ -393,10 +405,11 @@ src/
     i18n/                 translations.ts, server.ts, client.tsx
     catalog.ts  session.ts  profile.ts  phone.ts  geo.ts  sheets.ts  telegram.ts  moyasar.ts  policies.ts  types.ts
   proxy.ts                route gating (Next 16's replacement for middleware)
-supabase/migrations/      0001_init.sql, 0002_orders_address_on_delete_set_null.sql (both applied)
-public/                   hero.jpeg, headerbg.jpeg, footerbg.jpeg, products/*.jpeg (+ unused default Next svgs)
+supabase/migrations/      0001_init.sql, 0002_orders_address_on_delete_set_null.sql, 0003_orders_payment_status_refunds.sql
+public/                   hero.jpeg, headerbg.jpeg, footerbg.jpeg, products/*.jpeg, data/mosques.geojson (+ unused default Next svgs)
 policies/  products/  pics/   owner's source material: legal .txt files, price-list .docx, original images
 .github/workflows/        sync-sheet.yml (dead weight, see §5.6)
+scripts/update-mosques.mjs  refreshes public/data/mosques.geojson
 AGENTS.md  CLAUDE.md  README.md  SETUP.md  HANDOFF.txt (private)
 ```
 
@@ -460,7 +473,7 @@ you click *Restore/Unpause* in the Supabase dashboard.
 **Update the policies** — edit the `.txt` in `/policies`, copy the new text verbatim into
 `src/lib/policies.ts`, preview `/policies/<slug>`.
 
-**Change the WhatsApp number** — `src/components/shop/whatsapp-button.tsx`.
+**Change the WhatsApp number** — it is hard-coded in `src/components/shop/site-footer.tsx`, `src/components/shop/shop-header.tsx` and `src/app/(shop)/products/[slug]/page.tsx`.
 
 ## 11. Testing and verifying changes
 
@@ -509,8 +522,8 @@ There are no automated tests, so verification is manual and should be explicit.
    payment). Clean up occasionally; no automatic expiry exists.
 2. **Apple Pay is untested end to end** — it needs a real Apple device with a card in Wallet,
    so only the registration and button rendering were checked (§5.8).
-3. **Sync does one DB query per Sheet row every 2 minutes**, and re-reads the whole Sheet each
-   time. Fine for hundreds of orders; revisit (batching, or only recent rows) if volume grows.
+3. **Sync re-reads the whole Sheet every 2 minutes** (the DB lookups are batched, 150 orders
+   per query). Fine for hundreds of orders; revisit (only recent rows) if volume grows.
 4. **Telegram messages and the Google Sheet are in English** while the storefront is Arabic.
    Not changed because it was never requested.
 5. **No phone verification** (see §5.1 / §14).
@@ -529,8 +542,7 @@ There are no automated tests, so verification is manual and should be explicit.
 - **Auth is phone-only.** Anyone who knows a phone number can read that account's orders and
   addresses. Fine while the data is test data and low-sensitivity; add OTP (e.g. SMS) before
   scale. There is also **no rate limiting** on signup/login, so profiles can be created freely.
-- **`signUpOrLogIn` redirects to a client-supplied `next` value without validating it** (open
-  redirect). Restrict it to same-origin paths starting with `/` and not `//`.
+- `signUpOrLogIn` only follows a `next` value that is a same-site path (starts with `/`, not `//`).
 - All data access uses the **service-role key**; correctness depends on every query filtering by
   `profile.id`. Review any new query with that in mind. Never import `createAdminClient` into a
   Client Component.
