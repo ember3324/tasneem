@@ -22,12 +22,22 @@ export async function saveAddressAndCheckServiceArea(
 
   const lat = parseFloat(String(formData.get('lat') ?? ''))
   const lng = parseFloat(String(formData.get('lng') ?? ''))
+  const mosqueName = String(formData.get('mosqueName') ?? '').trim().slice(0, 120)
   const defaultLabel = t(locale, 'address.labelPlaceholder')
-  const label = String(formData.get('label') ?? defaultLabel).trim() || defaultLabel
-  const addressLine = String(formData.get('addressLine') ?? '').trim()
+  const rawLabel = String(formData.get('label') ?? '').trim()
+  // The untouched default label ("المنزل") says nothing for a mosque delivery —
+  // name the saved address after the mosque instead.
+  const label = rawLabel && rawLabel !== defaultLabel ? rawLabel : mosqueName || defaultLabel
+  const details = String(formData.get('addressLine') ?? '').trim()
+  // No separate DB column: the mosque name leads address_line, which is what
+  // the order Telegram message, the Sheet and the address card already show.
+  const addressLine = [mosqueName, details].filter(Boolean).join(' — ')
 
   if (Number.isNaN(lat) || Number.isNaN(lng)) {
     return { error: t(locale, 'address.error.needLocation') }
+  }
+  if (!mosqueName) {
+    return { error: t(locale, 'address.error.needMosqueName') }
   }
 
   const admin = createAdminClient()

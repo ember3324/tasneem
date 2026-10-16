@@ -9,27 +9,36 @@ import { useLocale } from '@/lib/i18n/client'
 // mapbox-gl is a large library used only on this page — load it only once
 // this component actually mounts client-side instead of bundling it into
 // every render of the address form.
-const LocationPicker = dynamic(() => import('./location-picker').then((m) => m.LocationPicker), {
-  ssr: false,
-  loading: () => <div className="h-80 w-full animate-pulse rounded-xl border border-ocean-200 bg-ocean-50" />,
-})
+const mapPlaceholder = () => <div className="h-80 w-full animate-pulse rounded-xl border border-ocean-200 bg-ocean-50" />
+
+// Google Maps (complete mosque coverage) when its key is configured; otherwise
+// the Mapbox picker with the OpenStreetMap mosque file.
+const LocationPicker = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY
+  ? dynamic(() => import('./google-location-picker').then((m) => m.GoogleLocationPicker), {
+      ssr: false,
+      loading: mapPlaceholder,
+    })
+  : dynamic(() => import('./location-picker').then((m) => m.LocationPicker), {
+      ssr: false,
+      loading: mapPlaceholder,
+    })
 
 export function AddressForm() {
   const [state, formAction, pending] = useActionState(saveAddressAndCheckServiceArea, null)
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null)
-  const [addressLine, setAddressLine] = useState('')
-  const [autoLine, setAutoLine] = useState('')
+  const [mosqueName, setMosqueName] = useState('')
+  const [autoName, setAutoName] = useState('')
   const { t } = useLocale()
 
-  // Choosing a mosque on the map fills the address note with its name — but
-  // never over something the customer typed themselves.
+  // Choosing a named mosque on the map fills the mosque-name field — but never
+  // over something the customer typed themselves. Mosques missing from the map
+  // (or unnamed there) are handled by the customer typing the name.
   function handleLocation(next: { lat: number; lng: number }, place?: { name: string }) {
     setCoords(next)
     if (!place) return
-    const line = `${t('address.nextTo')} ${place.name}`
-    if (addressLine === '' || addressLine === autoLine) {
-      setAddressLine(line)
-      setAutoLine(line)
+    if (mosqueName === '' || mosqueName === autoName) {
+      setMosqueName(place.name)
+      setAutoName(place.name)
     }
   }
 
@@ -53,6 +62,23 @@ export function AddressForm() {
       <LocationPicker onChange={handleLocation} />
 
       <div>
+        <label htmlFor="mosqueName" className="field-label">
+          {t('address.mosqueName')}
+        </label>
+        <input
+          id="mosqueName"
+          name="mosqueName"
+          type="text"
+          required
+          value={mosqueName}
+          onChange={(e) => setMosqueName(e.target.value)}
+          placeholder={t('address.mosqueNamePlaceholder')}
+          className="field"
+        />
+        <p className="mt-1 text-xs text-neutral-500">{t('address.mosqueNameHint')}</p>
+      </div>
+
+      <div>
         <label htmlFor="label" className="field-label">
           {t('address.label')}
         </label>
@@ -73,8 +99,6 @@ export function AddressForm() {
           id="addressLine"
           name="addressLine"
           type="text"
-          value={addressLine}
-          onChange={(e) => setAddressLine(e.target.value)}
           className="field"
         />
       </div>
