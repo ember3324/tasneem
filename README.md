@@ -257,6 +257,13 @@ the pay page shows an English "Payments are not configured yet" message.
 Keys: `.env.local` and Vercel hold the **live** keys (`pk_live_`/`sk_live_`); the test keys are
 kept as comments in `.env.local` for switching back. One webhook is registered in Moyasar
 (`/api/payments/webhook`, events `payment_paid` + `payment_failed`) and covers both modes.
+Apple Pay runs through the same form (`methods: ['applepay', 'creditcard']`) using Moyasar's
+web registration — no Apple Developer account. The domain is registered under Settings →
+Apple Pay - Domains in the Moyasar dashboard, and the verification file lives at
+`public/.well-known/apple-developer-merchantid-domain-association` (no extension; it is
+per-account, so regenerate it from the dashboard if the domain is ever re-registered).
+After any Moyasar payment the browser is sent to `/api/payments/callback`, which verifies the
+payment and marks the order paid before the order page loads.
 The publishable key is a *Config* variable in Vercel (Production only); Vercel refuses a
 `NEXT_PUBLIC_` name as a Secret. A plain "Redeploy" of the same commit fails (`deploymentId`
 is derived from the commit SHA and must be unique) — push a new commit instead.
@@ -500,7 +507,8 @@ There are no automated tests, so verification is manual and should be explicit.
 1. **Abandoned card orders linger in the DB.** A card order whose payment is never completed
    stays `payment_status = 'pending'` (it is *not* in the Sheet/Telegram — those wait for
    payment). Clean up occasionally; no automatic expiry exists.
-2. **Moyasar Apple Pay / mada-only methods** are not enabled: the form is `creditcard` only.
+2. **Apple Pay is untested end to end** — it needs a real Apple device with a card in Wallet,
+   so only the registration and button rendering were checked (§5.8).
 3. **Sync does one DB query per Sheet row every 2 minutes**, and re-reads the whole Sheet each
    time. Fine for hundreds of orders; revisit (batching, or only recent rows) if volume grows.
 4. **Telegram messages and the Google Sheet are in English** while the storefront is Arabic.

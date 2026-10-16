@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { useRouter } from 'next/navigation'
 
 const MOYASAR_JS_URL = 'https://cdn.moyasar.com/mpf/1.15.0/moyasar.js'
 const MOYASAR_CSS_URL = 'https://cdn.moyasar.com/mpf/1.15.0/moyasar.css'
@@ -26,7 +25,6 @@ export function MoyasarCardForm({
   publishableKey: string
 }) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const router = useRouter()
 
   useEffect(() => {
     let cancelled = false
@@ -69,7 +67,15 @@ export function MoyasarCardForm({
         description: `Order ${orderNumber}`,
         publishable_api_key: publishableKey,
         callback_url: `${window.location.origin}/api/payments/callback?order=${orderNumber}`,
-        methods: ['creditcard'],
+        // Apple Pay only renders on devices/browsers that support it; everyone
+        // else just sees the card form.
+        methods: ['applepay', 'creditcard'],
+        supported_networks: ['visa', 'mastercard', 'mada'],
+        apple_pay: {
+          country: 'SA',
+          label: 'نبع مكيون',
+          validate_merchant_url: 'https://api.moyasar.com/v1/applepay/initiate',
+        },
         metadata: { order_number: orderNumber },
         on_completed: async function (payment: { id: string }) {
           try {
@@ -79,7 +85,14 @@ export function MoyasarCardForm({
               body: JSON.stringify({ orderNumber, moyasarPaymentId: payment.id }),
             })
           } finally {
-            router.push(`/orders/${orderNumber}`)
+            // Apple Pay (and a card with no 3-D Secure step) never goes through
+            // callback_url, so send the customer there ourselves: it re-verifies
+            // the payment with Moyasar and marks the order paid before they land
+            // on the order page, instead of leaving it to the webhook's timing.
+            const callback = new URL('/api/payments/callback', window.location.origin)
+            callback.searchParams.set('order', orderNumber)
+            callback.searchParams.set('id', payment.id)
+            window.location.href = callback.toString()
           }
         },
       })
@@ -89,7 +102,7 @@ export function MoyasarCardForm({
     return () => {
       cancelled = true
     }
-  }, [orderNumber, amountSar, publishableKey, router])
+  }, [orderNumber, amountSar, publishableKey])
 
   return <div ref={containerRef} className="mysr-form" />
 }
