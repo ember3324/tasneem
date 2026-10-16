@@ -29,14 +29,24 @@ export async function GET(request: Request) {
   const admin = createAdminClient()
   const updates = await fetchSheetUpdates()
 
+  // One query per chunk of Sheet rows instead of one per row — this runs
+  // every two minutes over the whole Sheet. Chunked to keep the request URL
+  // short enough for PostgREST.
+  type OrderRow = { id: string; order_number: string; status: string; proof_photo_url: string | null }
+  const ordersByNumber = new Map<string, OrderRow>()
+  const orderNumbers = [...new Set(updates.map((u) => u.orderId))]
+  for (let i = 0; i < orderNumbers.length; i += 150) {
+    const { data } = await admin
+      .from('orders')
+      .select('id, order_number, status, proof_photo_url')
+      .in('order_number', orderNumbers.slice(i, i + 150))
+      .returns<OrderRow[]>()
+    for (const row of data ?? []) ordersByNumber.set(row.order_number, row)
+  }
+
   let changed = 0
   for (const update of updates) {
-    const { data: order } = await admin
-      .from('orders')
-      .select('id, status, proof_photo_url')
-      .eq('order_number', update.orderId)
-      .maybeSingle()
-
+    const order = ordersByNumber.get(update.orderId)
     if (!order) continue
 
     const patch: Record<string, string> = {}

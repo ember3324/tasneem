@@ -62,6 +62,14 @@ export async function createOrder(
     return { error: t(locale, 'checkout.error.emptyCart') }
   }
 
+  // A product can be hidden (in_stock = false) after it was put in the cart.
+  const unavailable = cartItems.filter((i) => !i.product.in_stock)
+  if (unavailable.length > 0) {
+    return {
+      error: `${t(locale, 'checkout.error.unavailable')} ${unavailable.map((i) => i.product.name).join('، ')}`,
+    }
+  }
+
   const totalAmount = cartItems.reduce((sum, i) => sum + i.product.price * i.quantity, 0)
   const itemsSummary = cartItems.map((i) => `${i.quantity}x ${i.product.name}`).join('; ')
 
@@ -101,7 +109,7 @@ export async function createOrder(
   )
 
   await admin.from('cart_items').delete().eq('user_id', profile.id)
-  // The header/bottom-nav cart count lives in the shop layout; without this it
+  // The header and footer cart count live in the shop layout; without this it
   // keeps showing the emptied cart's old count on the pages we redirect to.
   revalidatePath('/', 'layout')
 

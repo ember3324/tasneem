@@ -47,12 +47,38 @@ export async function sendOrderNotification(order: OrderForNotification): Promis
 
   lines.push('', `📍 <a href="${mapsLink}">Delivery location</a>`)
 
+  await postMessage(token, chatId, lines.join('\n'))
+}
+
+/** Tells the owner a card payment was refunded, since the order's Sheet row says it was paid. */
+export async function sendRefundNotification(refund: {
+  orderNumber: string
+  customerName: string
+  amountSar: number
+  totalSar: number
+  full: boolean
+}): Promise<void> {
+  const token = process.env.TELEGRAM_BOT_TOKEN
+  const chatId = process.env.TELEGRAM_CHAT_ID
+  if (!token || !chatId) return
+
+  const lines = [
+    `💸 <b>Refund ${escapeHtml(refund.orderNumber)}</b>`,
+    '',
+    `<b>Customer:</b> ${escapeHtml(refund.customerName)}`,
+    `<b>Refunded:</b> ${refund.amountSar.toFixed(2)} of ${refund.totalSar.toFixed(2)} SAR${refund.full ? '' : ' (partial)'}`,
+  ]
+
+  await postMessage(token, chatId, lines.join('\n'))
+}
+
+async function postMessage(token: string, chatId: string, text: string) {
   await fetch(`${TELEGRAM_API}/bot${token}/sendMessage`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       chat_id: chatId,
-      text: lines.join('\n'),
+      text,
       parse_mode: 'HTML',
       disable_web_page_preview: true,
     }),

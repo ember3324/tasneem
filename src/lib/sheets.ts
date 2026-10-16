@@ -144,6 +144,31 @@ export async function appendOrderRow(order: OrderForSheet): Promise<number> {
   return match ? parseInt(match[1], 10) : -1
 }
 
+/**
+ * Rewrites the Payment Type cell (column G) of an already-published order,
+ * e.g. to flag a refund. The row is only touched if column A still holds this
+ * order's number — rows may have been sorted or deleted by hand since it was
+ * appended, and writing to the wrong order's row would be worse than skipping.
+ */
+export async function updateSheetPaymentType(rowNumber: number, orderNumber: string, text: string) {
+  if (rowNumber < 2) return
+  const sheets = getSheetsClient()
+  const spreadsheetId = process.env.GOOGLE_SHEET_ID!
+
+  const current = await sheets.spreadsheets.values.get({
+    spreadsheetId,
+    range: `${SHEET_NAME}!A${rowNumber}`,
+  })
+  if (current.data.values?.[0]?.[0] !== orderNumber) return
+
+  await sheets.spreadsheets.values.update({
+    spreadsheetId,
+    range: `${SHEET_NAME}!G${rowNumber}`,
+    valueInputOption: 'RAW',
+    requestBody: { values: [[text]] },
+  })
+}
+
 export type SheetRowUpdate = {
   rowNumber: number
   orderId: string

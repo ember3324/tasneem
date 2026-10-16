@@ -25,7 +25,7 @@ export const translations = {
   'auth.login.newHere': 'جديد هنا؟',
   'auth.login.createAccount': 'إنشاء حساب',
   'auth.error.invalidPhone': 'أدخل رقم جوال سعودي صحيح، مثال: 05XXXXXXXX.',
-  'auth.error.unrecognizedNumber': 'هذا الرقم غير مسجّل — أدخل اسمك لإنشاء حساب.',
+  'auth.error.unrecognizedNumber': 'هذا الرقم غير مسجّل — أنشئ حسابًا جديدًا بالاسم ورقم الجوال.',
   'auth.error.couldNotCreate': 'تعذّر إنشاء الحساب.',
 
   'shop.title': 'المنتجات',
@@ -51,6 +51,8 @@ export const translations = {
   'address.useMyLocation': '📍 استخدم موقعي الحالي',
   'address.locating': 'جارٍ تحديد الموقع…',
   'address.dragPinHint': 'اسحب الدبوس أو انقر على الخريطة لتحديد موقع التوصيل الدقيق.',
+  'address.mosqueHint': 'تظهر المساجد على الخريطة عند التقريب — اضغط على أي مسجد لتحديده موقعًا للتوصيل.',
+  'address.nextTo': 'بجانب',
   'address.label': 'التسمية',
   'address.labelPlaceholder': 'المنزل',
   'address.details': 'تفاصيل العنوان (المبنى، الشارع، الشقة)',
@@ -79,6 +81,7 @@ export const translations = {
   'checkout.error.addressNotFound': 'العنوان غير موجود.',
   'checkout.error.outsideArea': 'هذا العنوان خارج نطاق التوصيل لدينا.',
   'checkout.error.emptyCart': 'سلتك فارغة.',
+  'checkout.error.unavailable': 'بعض المنتجات لم تعد متوفرة، أزلها من السلة للمتابعة:',
   'checkout.error.couldNotCreate': 'تعذّر إنشاء الطلب.',
   'checkout.pay.heading': 'ادفع',
   'checkout.pay.order': 'الطلب',
@@ -96,6 +99,9 @@ export const translations = {
   'orders.payment': 'الدفع',
   'orders.paidOnline': 'مدفوع إلكترونيًا',
   'orders.payOnline': 'الدفع الإلكتروني',
+  'orders.refunded': 'تم استرداد المبلغ',
+  'orders.partiallyRefunded': 'تم استرداد جزء من المبلغ',
+  'orders.awaitingPayment': 'بانتظار الدفع',
   'orders.cashOnDelivery': 'الدفع عند الاستلام',
   'orders.pendingSuffix': '(قيد الانتظار)',
   'orders.completePayment': 'إكمال الدفع',
@@ -115,7 +121,6 @@ export const translations = {
   'account.outsideArea': 'خارج نطاق التوصيل',
   'account.addressInUse': 'هذا العنوان مستخدم في طلب سابق ولا يمكن إزالته.',
 
-  'whatsapp.chat': 'تواصل عبر واتساب',
 } as const
 
 export type TranslationKey = keyof typeof translations

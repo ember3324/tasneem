@@ -51,6 +51,9 @@ export default async function OrdersPage() {
 }
 
 function OrderRow({ order, locale }: { order: Order; locale: Locale }) {
+  const awaitingPayment =
+    order.payment_method === 'card' && (order.payment_status === 'pending' || order.payment_status === 'failed')
+
   return (
     <Link
       href={`/orders/${order.order_number}`}
@@ -64,6 +67,9 @@ function OrderRow({ order, locale }: { order: Order; locale: Locale }) {
         <p className="inline-block rounded-full bg-brand-50 px-2.5 py-1 text-xs font-bold text-brand-700">
           {t(locale, `status.${order.status}`)}
         </p>
+        {awaitingPayment && (
+          <p className="mt-1 text-xs font-bold text-amber-600">{t(locale, 'orders.awaitingPayment')}</p>
+        )}
         <p dir="ltr" className="mt-1 text-sm font-bold text-accent-600">{order.total_amount.toFixed(2)} ر.س</p>
       </div>
     </Link>

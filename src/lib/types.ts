@@ -33,7 +33,13 @@ export type Address = {
 
 export type OrderStatus = 'pending' | 'confirmed' | 'out_for_delivery' | 'completed' | 'cancelled'
 export type PaymentMethod = 'cash' | 'card'
-export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'cod_pending'
+export type PaymentStatus =
+  | 'pending'
+  | 'paid'
+  | 'failed'
+  | 'cod_pending'
+  | 'refunded'
+  | 'partially_refunded'
 
 export type Order = {
   id: string

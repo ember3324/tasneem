@@ -20,7 +20,10 @@ export async function signUpOrLogIn(
   const locale = await getLocale()
   const phoneRaw = String(formData.get('phone') ?? '')
   const fullName = String(formData.get('fullName') ?? '').trim()
-  const next = String(formData.get('next') ?? '/')
+  // `next` comes from the URL, so anyone can craft a login link that bounces
+  // the customer to another site afterwards. Same-site paths only.
+  const rawNext = String(formData.get('next') ?? '/')
+  const next = rawNext.startsWith('/') && !rawNext.startsWith('//') && !rawNext.startsWith('/\\') ? rawNext : '/'
 
   const phone = normalizeSaudiPhone(phoneRaw)
   if (!phone) {

@@ -4,9 +4,20 @@ import { notFound, redirect } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getCurrentProfile } from '@/lib/profile'
 import { getLocale, t } from '@/lib/i18n/server'
-import type { Order, OrderItem, OrderStatus } from '@/lib/types'
+import type { TranslationKey } from '@/lib/i18n/translations'
+import type { Order, OrderItem, OrderStatus, PaymentStatus } from '@/lib/types'
 
 const STATUS_ORDER: OrderStatus[] = ['pending', 'confirmed', 'out_for_delivery', 'completed']
+
+// How a card order's payment is described. Cash orders never reach this.
+const CARD_PAYMENT_LABEL: Record<PaymentStatus, TranslationKey> = {
+  pending: 'orders.payOnline',
+  failed: 'orders.payOnline',
+  cod_pending: 'orders.payOnline',
+  paid: 'orders.paidOnline',
+  refunded: 'orders.refunded',
+  partially_refunded: 'orders.partiallyRefunded',
+}
 
 export default async function OrderDetailPage(props: PageProps<'/orders/[orderNumber]'>) {
   const { orderNumber } = await props.params
@@ -30,6 +41,8 @@ export default async function OrderDetailPage(props: PageProps<'/orders/[orderNu
     localePromise,
   ])
   const currentStepIndex = STATUS_ORDER.indexOf(order.status)
+  const awaitingPayment =
+    order.payment_method === 'card' && (order.payment_status === 'pending' || order.payment_status === 'failed')
 
   return (
     <div className="mx-auto max-w-lg">
@@ -92,10 +105,8 @@ export default async function OrderDetailPage(props: PageProps<'/orders/[orderNu
           <div className="flex justify-between">
             <dt>{t(locale, 'orders.payment')}</dt>
             <dd>
-              {order.payment_method === 'card'
-                ? t(locale, order.payment_status === 'paid' ? 'orders.paidOnline' : 'orders.payOnline')
-                : t(locale, 'orders.cashOnDelivery')}
-              {order.payment_method === 'card' && order.payment_status !== 'paid' && (
+              {order.payment_method === 'card' ? t(locale, CARD_PAYMENT_LABEL[order.payment_status]) : t(locale, 'orders.cashOnDelivery')}
+              {awaitingPayment && (
                 <span className="ms-1 text-amber-600">{t(locale, 'orders.pendingSuffix')}</span>
               )}
             </dd>
@@ -103,7 +114,7 @@ export default async function OrderDetailPage(props: PageProps<'/orders/[orderNu
         </dl>
 
         {/* A failed or abandoned card payment would otherwise strand the customer here. */}
-        {order.payment_method === 'card' && order.payment_status !== 'paid' && order.status !== 'cancelled' && (
+        {awaitingPayment && order.status !== 'cancelled' && (
           <Link
             href={`/checkout/pay/${order.order_number}`}
             className="mt-4 block rounded-xl bg-brand-600 px-4 py-3 text-center text-sm font-bold text-white"

@@ -28,7 +28,11 @@ export async function GET(request: Request) {
     const payment = await fetchMoyasarPayment(paymentId)
     const amountMatches = payment.amount === toHalalas(order.total_amount)
 
-    if (payment.status === 'paid' && amountMatches && payment.currency === 'SAR') {
+    // A partly refunded payment still reports `paid`; don't let a replayed
+    // callback URL flip the order back once the refund has been recorded.
+    const settled = order.payment_status === 'refunded' || order.payment_status === 'partially_refunded'
+
+    if (payment.status === 'paid' && amountMatches && payment.currency === 'SAR' && !settled) {
       await admin
         .from('orders')
         // `status` is deliberately untouched: it's controlled from the Sheet,
@@ -36,7 +40,7 @@ export async function GET(request: Request) {
         .update({ payment_status: 'paid', moyasar_payment_id: payment.id })
         .eq('id', order.id)
       await publishOrder(order.id)
-    } else if (payment.status === 'failed' && order.payment_status !== 'paid') {
+    } else if (payment.status === 'failed' && order.payment_status !== 'paid' && !settled) {
       await admin
         .from('orders')
         .update({ payment_status: 'failed', moyasar_payment_id: payment.id })

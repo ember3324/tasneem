@@ -18,7 +18,10 @@ export default async function CheckoutPayPage(props: PageProps<'/checkout/pay/[o
 
   if (!order) notFound()
   if (order.payment_method !== 'card') redirect(`/orders/${orderNumber}`)
-  if (order.payment_status === 'paid') redirect(`/orders/${orderNumber}`)
+  // Only an order still waiting on its money can be paid; a cancelled one
+  // would take a payment for something the owner has already called off.
+  const payable = order.payment_status === 'pending' || order.payment_status === 'failed'
+  if (!payable || order.status === 'cancelled') redirect(`/orders/${orderNumber}`)
 
   const publishableKey = process.env.NEXT_PUBLIC_MOYASAR_PUBLISHABLE_KEY
   if (!publishableKey) {
