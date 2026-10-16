@@ -33,12 +33,19 @@ export function MoyasarCardForm({
 
     function loadScript(src: string) {
       return new Promise<void>((resolve, reject) => {
-        if (document.querySelector(`script[src="${src}"]`)) return resolve()
-        const script = document.createElement('script')
-        script.src = src
-        script.onload = () => resolve()
-        script.onerror = () => reject(new Error(`Failed to load ${src}`))
-        document.head.appendChild(script)
+        // React Strict Mode (dev) runs this effect twice: the second run finds
+        // the tag from the first run, which may not have finished loading yet.
+        // Resolving immediately there left window.Moyasar undefined and the
+        // form silently never rendered — so wait for the existing tag instead.
+        let script = document.querySelector<HTMLScriptElement>(`script[src="${src}"]`)
+        if (script && window.Moyasar) return resolve()
+        if (!script) {
+          script = document.createElement('script')
+          script.src = src
+          document.head.appendChild(script)
+        }
+        script.addEventListener('load', () => resolve())
+        script.addEventListener('error', () => reject(new Error(`Failed to load ${src}`)))
       })
     }
 

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { isValidMoyasarWebhook } from '@/lib/moyasar'
+import { publishOrder } from '@/lib/order-publish'
 
 // Configure this URL in the Moyasar dashboard (or via POST /v1/webhooks)
 // listening for payment_paid and payment_failed, with `shared_secret` set
@@ -34,14 +35,13 @@ export async function POST(request: Request) {
   }
 
   if (body.type === 'payment_paid') {
+    // `status` is deliberately untouched: it's controlled from the Sheet,
+    // and the Sheet sync would revert any status we set here.
     await admin
       .from('orders')
-      .update({
-        payment_status: 'paid',
-        moyasar_payment_id: paymentId,
-        ...(order.status === 'pending' ? { status: 'confirmed' } : {}),
-      })
+      .update({ payment_status: 'paid', moyasar_payment_id: paymentId })
       .eq('id', order.id)
+    await publishOrder(order.id)
   } else if (body.type === 'payment_failed' && order.payment_status !== 'paid') {
     await admin
       .from('orders')

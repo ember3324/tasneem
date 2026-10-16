@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { fetchMoyasarPayment, toHalalas } from '@/lib/moyasar'
+import { publishOrder } from '@/lib/order-publish'
 
 // Moyasar's callback_url — the customer's browser lands here after
 // completing (or failing/cancelling) the hosted card form, with the
@@ -30,14 +31,11 @@ export async function GET(request: Request) {
     if (payment.status === 'paid' && amountMatches && payment.currency === 'SAR') {
       await admin
         .from('orders')
-        .update({
-          payment_status: 'paid',
-          moyasar_payment_id: payment.id,
-          // Only auto-advance from 'pending' — never overwrite progress an
-          // admin has already made in the Sheet (out_for_delivery, etc.).
-          ...(order.status === 'pending' ? { status: 'confirmed' } : {}),
-        })
+        // `status` is deliberately untouched: it's controlled from the Sheet,
+        // and the Sheet sync would revert any status we set here.
+        .update({ payment_status: 'paid', moyasar_payment_id: payment.id })
         .eq('id', order.id)
+      await publishOrder(order.id)
     } else if (payment.status === 'failed' && order.payment_status !== 'paid') {
       await admin
         .from('orders')

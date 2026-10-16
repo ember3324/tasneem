@@ -5,8 +5,7 @@ import { redirect } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getCurrentProfile } from '@/lib/profile'
 import { isWithinServiceArea, type ServiceZone } from '@/lib/geo'
-import { appendOrderRow, ensureSheetHeader } from '@/lib/sheets'
-import { sendOrderNotification } from '@/lib/telegram'
+import { publishOrder } from '@/lib/order-publish'
 import { getLocale, t } from '@/lib/i18n/server'
 import type { Address, PaymentMethod, Product } from '@/lib/types'
 
@@ -102,51 +101,11 @@ export async function createOrder(
 
   await admin.from('cart_items').delete().eq('user_id', profile.id)
 
-  // Best-effort: the order already exists in our DB regardless of whether
-  // the sheet write succeeds. A missing sheet row just means the periodic
-  // sync job has nothing to reconcile yet — it won't block checkout.
-  try {
-    await ensureSheetHeader()
-    const rowNumber = await appendOrderRow({
-      orderNumber: order.order_number,
-      customerName: profile.full_name,
-      customerPhone: profile.phone,
-      lat: address.lat,
-      lng: address.lng,
-      itemsSummary,
-      totalAmount,
-      paymentMethod,
-      status: 'pending',
-      createdAt: order.created_at,
-      addressDetails: address.address_line,
-    })
-    await admin
-      .from('orders')
-      .update({ sheet_row_number: rowNumber, sheet_synced_at: new Date().toISOString() })
-      .eq('id', order.id)
-  } catch (err) {
-    console.error('Failed to append order to Google Sheet', err)
-  }
-
-  // Independent failure domain from the Sheets write above — a Telegram
-  // outage shouldn't block the sheet sync, or vice versa.
-  try {
-    await sendOrderNotification({
-      orderNumber: order.order_number,
-      customerName: profile.full_name,
-      customerPhone: profile.phone,
-      lat: address.lat,
-      lng: address.lng,
-      itemsSummary,
-      totalAmount,
-      paymentMethod,
-      addressDetails: address.address_line,
-    })
-  } catch (err) {
-    console.error('Failed to send Telegram order notification', err)
-  }
-
   if (paymentMethod === 'cash') {
+    // Card orders are published to the Sheet/Telegram only once payment is
+    // confirmed (see publishOrder callers in /api/payments/*), so an
+    // abandoned card payment never reaches the owner as a real order.
+    await publishOrder(order.id)
     redirect(`/orders/${order.order_number}`)
   } else {
     redirect(`/checkout/pay/${order.order_number}`)

@@ -122,7 +122,8 @@ export async function appendOrderRow(order: OrderForSheet): Promise<number> {
     `${order.lat}, ${order.lng}`,
     order.itemsSummary,
     order.totalAmount.toFixed(2),
-    order.paymentMethod === 'cash' ? 'Cash' : 'Credit',
+    // Card orders only reach the Sheet after payment is confirmed.
+    order.paymentMethod === 'cash' ? 'Cash' : 'Credit (Paid)',
     STATUS_TO_SHEET[order.status] ?? order.status,
     '',
     order.createdAt,

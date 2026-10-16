@@ -38,7 +38,7 @@ export async function sendOrderNotification(order: OrderForNotification): Promis
     itemLines,
     '',
     `<b>Total:</b> ${order.totalAmount.toFixed(2)} SAR`,
-    `<b>Payment:</b> ${order.paymentMethod === 'cash' ? 'Cash on delivery' : 'Card (online)'}`,
+    `<b>Payment:</b> ${order.paymentMethod === 'cash' ? 'Cash on delivery' : 'Card (online) — PAID ✅'}`,
   ]
 
   if (order.addressDetails) {

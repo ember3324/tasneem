@@ -68,7 +68,7 @@ export const translations = {
   'checkout.items': 'العناصر',
   'checkout.total': 'الإجمالي',
   'checkout.paymentMethod': 'طريقة الدفع',
-  'checkout.payOnline': 'الدفع الإلكتروني (مدى / بطاقة / Apple Pay)',
+  'checkout.payOnline': 'الدفع الإلكتروني (مدى / بطاقة)',
   'checkout.cashOnDelivery': 'الدفع عند الاستلام',
   'checkout.continueToPayment': 'المتابعة إلى الدفع',
   'checkout.placeOrder': 'إتمام الطلب',

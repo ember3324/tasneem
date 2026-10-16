@@ -5,7 +5,7 @@ Customers sign up with name + phone, pick water packages, check out with a map p
 inside the delivery zone, and track the order. The owner manages order status from a
 Google Sheet and gets a Telegram message on every new order.
 
-- **Live:** https://tasneem-shop.vercel.app (auto-deploys `main` on every push)
+- **Live:** https://nabaa-makkiyoon.com (auto-deploys `main` on every push)
 - **Repo:** https://github.com/ember3324/tasneem (**public** — never commit secrets or personal data)
 - **Status:** test phase. Every order currently in the database is test data. No real customers yet.
 - **Owner:** Hani. A second person also works on the project (taking turns in the same Dropbox folder).
