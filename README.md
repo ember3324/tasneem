@@ -147,22 +147,23 @@ changing it in Vercel needs a redeploy to take effect.
   redirects there). There is no category-picking step.
 - `products.category_id` is NOT NULL, so **one hidden category row** (`باقات السقيا`) still
   exists. It is never shown. Treat it as plumbing.
-- Current products (from `products/nabaa-makiyoon-pricelist.docx`; photos in `public/products/`):
+- Current products (managed in the Supabase `products` table or `/admin/products`; the
+  photo is `public/products/tall.jpeg` for all of them):
 
   | # | Name | Slug | Unit | Price (SAR) |
   |---|---|---|---|---|
-  | 1 | طل | `makyoon-saqya-tall` | 10 شرنك | 135 |
-  | 2 | ديمة | `makyoon-saqya-dimah` | 50 شرنك | 510 |
-  | 3 | وابل | `makyoon-saqya-wabil` | 100 شرنك | 990 |
-  | 4 | صيب | `makyoon-saqya-sayyib` | 300 شرنك | 2,730 |
-  | 5 | غيث | `makyoon-saqya-ghaith` | 500 شرنك | 4,450 |
-  | 6 | مزنة | `makyoon-saqya-muznah` | 1000 شرنك | 8,750 |
+  | 1 | مياه ٣٣٠ مل | `330ml` | حزمة ٢٠ عبوة | 11.99 |
+  | 2 | مياه ٣٣٠ مل — ١٠ حزم | `330ml-10` | ١٠ حزم — ٢٠٠ عبوة | 119.90 |
+  | 3 | مياه ٣٣٠ مل — ٢٥ حزمة | `330ml-25` | ٢٥ حزمة — ٥٠٠ عبوة | 299.75 |
+  | 4 | مياه ٣٣٠ مل — ٥٠ حزمة | `330ml-50` | ٥٠ حزمة — ١٠٠٠ عبوة | 599.50 |
+  | 5 | مياه ٣٣٠ مل — ١٠٠ حزمة | `330ml-100` | ١٠٠ حزمة — ٢٠٠٠ عبوة | 1,199.00 |
 
-  One **شرنك (shrink) = 20 bottles of 330 ml**. Packages are named after rain words, smallest
-  to largest. A seventh 17,000 SAR product was deliberately removed.
-- The product card shows the static label **"مياه 330 مل"** (hard-coded in
-  `src/app/(shop)/categories/page.tsx`), not the product name; the package name appears on
-  the product detail page.
+  The bulk packs are the single pack × N (price = single-pack price × N, no volume discount).
+  Their names carry the pack size on purpose: order summaries, the Sheet and Telegram only
+  store the product *name*, so identical names would be indistinguishable. If the single-pack
+  price changes, update the others to match.
+- The earlier six-product "rain names" catalog (طل / ديمة / وابل / …, priced per شرنك) was
+  replaced by this one; the old images remain in `public/products/`.
 
 ### 5.3 Cart
 
