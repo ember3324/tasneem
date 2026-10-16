@@ -68,7 +68,7 @@ Google Sheet and gets a Telegram message on every new order.
 | Maps | **Mapbox GL** 3 (+ `@mapbox/mapbox-gl-draw` for admin polygons); `@turf/turf` for point-in-polygon |
 | Orders admin | **Google Sheets API** via a service account (`googleapis`) |
 | Notifications | **Telegram Bot API** (plain `fetch`) |
-| Payments | **Moyasar** (KSA gateway) — code complete, no account yet |
+| Payments | **Moyasar** (KSA gateway) — live keys in use (see §5.8) |
 | Validation | Hand-written checks in server actions (`zod` is in `package.json` but not used anywhere yet) |
 | Hosting | **Vercel** (Hobby, region `cdg1`), cron pings from **cron-job.org** |
 
@@ -240,17 +240,26 @@ details, and a Google Maps link built from the pin. The message text is currentl
 Failures are swallowed (logged) so they never block checkout. If this sandbox cannot resolve
 `api.telegram.org` that is a local networking quirk; production is unaffected.
 
-### 5.8 Payments (Moyasar) — built, not live
+### 5.8 Payments (Moyasar) — live
 
 Flow, per `src/lib/moyasar.ts`: the pay page (`/checkout/pay/[orderNumber]`) renders Moyasar's
 hosted card form → on completion the browser calls `POST /api/payments/link` to store
 `moyasar_payment_id` → Moyasar redirects to `GET /api/payments/callback`, which **re-fetches
 the payment from Moyasar's API** and checks status/amount/currency before marking the order
-paid and moving `pending → confirmed` → `POST /api/payments/webhook` is the authoritative
-async confirmation (verified by comparing `secret_token` to `MOYASAR_WEBHOOK_SECRET`).
+`payment_status = 'paid'` → `POST /api/payments/webhook` is the authoritative async
+confirmation (verified by comparing `secret_token` to `MOYASAR_WEBHOOK_SECRET`).
+Order `status` is never touched by payment (the Sheet owns it). Card orders are only
+published to the Sheet/Telegram once paid, via `publishOrder()` in `src/lib/order-publish.ts`
+(idempotent: callback and webhook can both call it); cash orders publish at checkout.
 Amounts are converted SAR → halalas (`toHalalas`). Without `NEXT_PUBLIC_MOYASAR_PUBLISHABLE_KEY`
-the pay page shows an English "Payments are not configured yet" message. See §13 for
-problems to fix before this goes live.
+the pay page shows an English "Payments are not configured yet" message.
+
+Keys: `.env.local` and Vercel hold the **live** keys (`pk_live_`/`sk_live_`); the test keys are
+kept as comments in `.env.local` for switching back. One webhook is registered in Moyasar
+(`/api/payments/webhook`, events `payment_paid` + `payment_failed`) and covers both modes.
+The publishable key is a *Config* variable in Vercel (Production only); Vercel refuses a
+`NEXT_PUBLIC_` name as a Secret. A plain "Redeploy" of the same commit fails (`deploymentId`
+is derived from the commit SHA and must be unique) — push a new commit instead.
 
 ### 5.9 Admin
 
@@ -488,33 +497,23 @@ There are no automated tests, so verification is manual and should be explicit.
 
 ## 13. Known issues and open items
 
-1. **Card payment is not usable.** No Moyasar account/keys, yet `card` is the *default*
-   option in `src/components/checkout/checkout-form.tsx` (`useState<'cash' | 'card'>('card')`).
-   A customer who doesn't change it reaches a dead-end English error page. Until Moyasar is
-   configured, default to cash or hide the card option. Setup steps: `SETUP.md` §3 (test mode
-   first, then the webhook, then live keys after KYC).
-2. **Unpaid card orders are already "real" orders.** `createOrder` inserts the order, appends
-   the Sheet row and sends the Telegram message *before* payment. An abandoned card payment
-   leaves a `payment_status = 'pending'` order that still shows in the Sheet and Telegram.
-3. **Latent: Sheet sync can revert a paid order's status.** When Moyasar goes live, the
-   webhook/callback sets `status = 'confirmed'` in the DB, but the Sheet still says `Pending`
-   (the app never writes status back to the Sheet). The next sync run (≤2 min) sees a
-   difference and sets the DB back to `pending`. Fix before launch: also update the Sheet's
-   column H when the DB status changes, or make the sync ignore a Sheet value that hasn't been
-   edited since the row was written.
-4. **Sync does one DB query per Sheet row every 2 minutes**, and re-reads the whole Sheet each
+1. **Abandoned card orders linger in the DB.** A card order whose payment is never completed
+   stays `payment_status = 'pending'` (it is *not* in the Sheet/Telegram — those wait for
+   payment). Clean up occasionally; no automatic expiry exists.
+2. **Moyasar Apple Pay / mada-only methods** are not enabled: the form is `creditcard` only.
+3. **Sync does one DB query per Sheet row every 2 minutes**, and re-reads the whole Sheet each
    time. Fine for hundreds of orders; revisit (batching, or only recent rows) if volume grows.
-5. **Telegram messages and the Google Sheet are in English** while the storefront is Arabic.
+4. **Telegram messages and the Google Sheet are in English** while the storefront is Arabic.
    Not changed because it was never requested.
-6. **No phone verification** (see §5.1 / §14).
-7. **Supabase free tier pauses after ~7 days idle.** Consider a keep-alive ping or paid plan
+5. **No phone verification** (see §5.1 / §14).
+6. **Supabase free tier pauses after ~7 days idle.** Consider a keep-alive ping or paid plan
    before real customers.
-8. **Vercel region** is Paris (`cdg1`); Dubai (`dxb1`) would be closer to Mecca once Vercel lets
+7. **Vercel region** is Paris (`cdg1`); Dubai (`dxb1`) would be closer to Mecca once Vercel lets
    the Hobby plan select it.
-9. Housekeeping: `sync-sheet.yml` (dead), unused default SVGs in `public/`, legacy columns
+8. Housekeeping: `sync-sheet.yml` (dead), unused default SVGs in `public/`, legacy columns
    `addresses.city` / `addresses.is_default`, and the product-category plumbing could be
    cleaned up.
-10. Skipped from the reference design the owner supplied: a circular badge overlapping the
+9. Skipped from the reference design the owner supplied: a circular badge overlapping the
     header and carousel dots under the hero — can be built if requested.
 
 ## 14. Security notes
