@@ -1,6 +1,7 @@
 'use server'
 
 import { randomUUID } from 'crypto'
+import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getCurrentProfile } from '@/lib/profile'
@@ -100,6 +101,9 @@ export async function createOrder(
   )
 
   await admin.from('cart_items').delete().eq('user_id', profile.id)
+  // The header/bottom-nav cart count lives in the shop layout; without this it
+  // keeps showing the emptied cart's old count on the pages we redirect to.
+  revalidatePath('/', 'layout')
 
   if (paymentMethod === 'cash') {
     // Card orders are published to the Sheet/Telegram only once payment is

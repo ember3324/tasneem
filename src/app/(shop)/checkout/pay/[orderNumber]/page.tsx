@@ -23,9 +23,7 @@ export default async function CheckoutPayPage(props: PageProps<'/checkout/pay/[o
   const publishableKey = process.env.NEXT_PUBLIC_MOYASAR_PUBLISHABLE_KEY
   if (!publishableKey) {
     return (
-      <p className="text-sm text-red-600">
-        Payments are not configured yet (missing NEXT_PUBLIC_MOYASAR_PUBLISHABLE_KEY).
-      </p>
+      <p className="text-sm text-red-600">{t(locale, 'checkout.pay.notConfigured')}</p>
     )
   }
 

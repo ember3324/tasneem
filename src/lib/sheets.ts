@@ -8,7 +8,7 @@ import { google } from 'googleapis'
 //   D: GPS Coordinates    ("lat, lng", read-only display)
 //   E: Items              ("2x 5-Gallon Bottle; 1x Dispenser")
 //   F: Total (SAR)
-//   G: Payment Type       ("Cash" | "Credit")
+//   G: Payment Type       ("Cash" | "Credit (Paid)")
 //   H: Status             admin-edited dropdown, see STATUS_TO_SHEET below
 //   I: Proof Photo URL    admin pastes this in once delivered
 //   J: Created At

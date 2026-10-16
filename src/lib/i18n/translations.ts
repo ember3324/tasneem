@@ -82,6 +82,7 @@ export const translations = {
   'checkout.error.couldNotCreate': 'تعذّر إنشاء الطلب.',
   'checkout.pay.heading': 'ادفع',
   'checkout.pay.order': 'الطلب',
+  'checkout.pay.notConfigured': 'الدفع الإلكتروني غير متاح حاليًا، يرجى اختيار الدفع عند الاستلام.',
 
   'orders.current': 'الطلبات الحالية',
   'orders.noActive': 'لا توجد طلبات نشطة.',
@@ -94,8 +95,10 @@ export const translations = {
   'orders.total': 'الإجمالي',
   'orders.payment': 'الدفع',
   'orders.paidOnline': 'مدفوع إلكترونيًا',
+  'orders.payOnline': 'الدفع الإلكتروني',
   'orders.cashOnDelivery': 'الدفع عند الاستلام',
   'orders.pendingSuffix': '(قيد الانتظار)',
+  'orders.completePayment': 'إكمال الدفع',
   'orders.deliveryProof': 'إثبات التسليم',
   'status.pending': 'قيد الانتظار',
   'status.confirmed': 'مؤكد',

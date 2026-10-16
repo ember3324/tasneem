@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getCurrentProfile } from '@/lib/profile'
@@ -92,7 +93,7 @@ export default async function OrderDetailPage(props: PageProps<'/orders/[orderNu
             <dt>{t(locale, 'orders.payment')}</dt>
             <dd>
               {order.payment_method === 'card'
-                ? t(locale, 'orders.paidOnline')
+                ? t(locale, order.payment_status === 'paid' ? 'orders.paidOnline' : 'orders.payOnline')
                 : t(locale, 'orders.cashOnDelivery')}
               {order.payment_method === 'card' && order.payment_status !== 'paid' && (
                 <span className="ms-1 text-amber-600">{t(locale, 'orders.pendingSuffix')}</span>
@@ -100,6 +101,16 @@ export default async function OrderDetailPage(props: PageProps<'/orders/[orderNu
             </dd>
           </div>
         </dl>
+
+        {/* A failed or abandoned card payment would otherwise strand the customer here. */}
+        {order.payment_method === 'card' && order.payment_status !== 'paid' && order.status !== 'cancelled' && (
+          <Link
+            href={`/checkout/pay/${order.order_number}`}
+            className="mt-4 block rounded-xl bg-brand-600 px-4 py-3 text-center text-sm font-bold text-white"
+          >
+            {t(locale, 'orders.completePayment')}
+          </Link>
+        )}
 
         {order.status === 'completed' && order.proof_photo_url && (
           <div className="mt-4">
