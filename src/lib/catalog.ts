@@ -39,3 +39,24 @@ export const getProductBySlug = unstable_cache(
   ['product-by-slug'],
   { revalidate: 120, tags: ['products'] }
 )
+
+// Pack sizes of the same item are separate product rows whose slugs share a
+// stem: "330ml" (one pack), "330ml-10", "330ml-25"… The shop shows one card per
+// stem (the lowest sort_order row — its picture, name and price) and lists the
+// pack sizes as text in the add-to-cart picker.
+export function slugStem(slug: string): string {
+  return slug.replace(/-\d+$/, '')
+}
+
+export type ProductGroup = { main: Product; packs: Product[] }
+
+export function groupProducts(products: Product[]): ProductGroup[] {
+  const groups = new Map<string, ProductGroup>()
+  for (const p of products) {
+    const stem = slugStem(p.slug)
+    const g = groups.get(stem)
+    if (g) g.packs.push(p)
+    else groups.set(stem, { main: p, packs: [p] })
+  }
+  return [...groups.values()]
+}

@@ -1,8 +1,9 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { getAllProducts } from '@/lib/catalog'
+import { getAllProducts, groupProducts } from '@/lib/catalog'
 import { getCurrentProfile } from '@/lib/profile'
 import { AddToCartButton } from '@/components/shop/add-to-cart-button'
+import { PackPicker } from '@/components/shop/pack-picker'
 import { HeroBanner } from '@/components/shop/hero-banner'
 import { HighlightCards, type Highlight } from '@/components/shop/highlight-cards'
 import { getLocale, t } from '@/lib/i18n/server'
@@ -47,9 +48,13 @@ export default async function ShopPage(props: PageProps<'/categories'>) {
     text.replace(/[\u0660-\u0669]/g, (d) => String(d.charCodeAt(0) - 0x0660)).toLowerCase()
 
   const needle = foldDigits(query)
-  const products = needle
-    ? allProducts.filter((p) => foldDigits(`${p.name} ${p.unit ?? ''}`).includes(needle))
-    : allProducts
+  // One card per item; its pack sizes (10, 25, 50… packs) are picked from a
+  // text list on "add to cart" instead of each having its own card and photo.
+  const groups = groupProducts(allProducts)
+  const matching = needle
+    ? groups.filter((g) => g.packs.some((p) => foldDigits(`${p.name} ${p.unit ?? ''}`).includes(needle)))
+    : groups
+  const products = matching.map((g) => ({ ...g.main, packs: g.packs }))
 
   return (
     <div className="space-y-8">
@@ -87,7 +92,7 @@ export default async function ShopPage(props: PageProps<'/categories'>) {
             <div
               key={product.id}
               style={{ animationDelay: `${i * 40}ms` }}
-              className="surface surface-hover animate-fade-in-up relative flex w-full flex-col overflow-hidden sm:w-[calc(33.333%-0.667rem)]"
+              className="surface surface-hover animate-fade-in-up relative flex w-full flex-col sm:w-[calc(33.333%-0.667rem)]"
             >
               {/* The catalog is sorted by sort_order, so the first card is the
                   one the owner put at the top — but the badge only means
@@ -98,7 +103,7 @@ export default async function ShopPage(props: PageProps<'/categories'>) {
                 </span>
               )}
 
-              <Link href={`/products/${product.slug}`} className="relative block aspect-[3/2] w-full bg-white">
+              <Link href={`/products/${product.slug}`} className="relative block aspect-[3/2] w-full overflow-hidden rounded-t-2xl bg-white">
                 {product.image_url && (
                   <Image
                     src={product.image_url}
@@ -126,7 +131,14 @@ export default async function ShopPage(props: PageProps<'/categories'>) {
                   </span>
                   {/* Everything listed here is shown on purpose — the query
                       already filters the hidden ones out. */}
-                  <AddToCartButton productId={product.id} loggedIn={!!profile} />
+                  {product.packs.length > 1 ? (
+                    <PackPicker
+                      loggedIn={!!profile}
+                      options={product.packs.map((p) => ({ productId: p.id, label: p.unit ?? p.name, price: p.price }))}
+                    />
+                  ) : (
+                    <AddToCartButton productId={product.id} loggedIn={!!profile} />
+                  )}
                 </div>
               </div>
             </div>

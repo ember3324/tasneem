@@ -1,22 +1,27 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getProductBySlug } from '@/lib/catalog'
+import { getAllProducts, getProductBySlug, slugStem } from '@/lib/catalog'
 import { getCurrentProfile } from '@/lib/profile'
 import { AddToCartButton } from '@/components/shop/add-to-cart-button'
+import { PackPicker } from '@/components/shop/pack-picker'
 import { getLocale, t } from '@/lib/i18n/server'
 import { translateProductName } from '@/lib/i18n/translations'
 
 export default async function ProductPage(props: PageProps<'/products/[slug]'>) {
   const { slug } = await props.params
 
-  const [product, profile, locale] = await Promise.all([
+  const [product, profile, locale, allProducts] = await Promise.all([
     getProductBySlug(slug),
     getCurrentProfile(),
     getLocale(),
+    getAllProducts(),
   ])
 
   if (!product) notFound()
+
+  // The other pack sizes of this item (same slug stem), offered as a text list.
+  const packs = allProducts.filter((p) => slugStem(p.slug) === slugStem(product.slug))
 
   const name = translateProductName(locale, product)
 
@@ -60,7 +65,12 @@ export default async function ProductPage(props: PageProps<'/products/[slug]'>) 
           </p>
 
           <div className="mt-6">
-            {product.in_stock ? (
+            {product.in_stock && packs.length > 1 ? (
+              <PackPicker
+                loggedIn={!!profile}
+                options={packs.map((p) => ({ productId: p.id, label: p.unit ?? p.name, price: p.price }))}
+              />
+            ) : product.in_stock ? (
               <AddToCartButton productId={product.id} loggedIn={!!profile} />
             ) : (
               <span className="block rounded-xl bg-neutral-100 py-3 text-center text-sm text-neutral-400">
