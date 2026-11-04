@@ -10,7 +10,7 @@ const MOYASAR_CSS_URL = 'https://cdn.moyasar.com/mpf/1.15.0/moyasar.css'
 // anywhere — not in the page, not in the Moyasar dashboard. These hooks print
 // the real reason on screen so it can be read off the phone directly.
 // Remove this block (and the banner below) once Apple Pay works.
-const APPLE_PAY_DEBUG = true
+const APPLE_PAY_DEBUG = false
 
 declare global {
   interface Window {
@@ -157,12 +157,15 @@ export function MoyasarCardForm({
         // else just sees the card form.
         methods: ['applepay', 'creditcard'],
         supported_networks: ['visa', 'mastercard', 'mada'],
-        // moyasar.js has no default for this: leaving it out makes the form
-        // refuse to render at all with "Validate Merchat URL is required for
-        // Apple Pay", which also hides the card form. It must stay.
+        // moyasar.js has no default for validate_merchant_url: leaving it out
+        // makes the form refuse to render at all ("Validate Merchat URL is
+        // required for Apple Pay"), which hides the card form too.
+        // label must be ASCII — Moyasar rejects an Arabic one with
+        // "Invalid display name, only ASCII is supported." and merchant
+        // validation then fails, so the Apple Pay sheet closes on its own.
         apple_pay: {
           country: 'SA',
-          label: 'نبع مكيون',
+          label: 'Nabaa Makkiyoon',
           validate_merchant_url: 'https://api.moyasar.com/v1/applepay/initiate',
         },
         metadata: { order_number: orderNumber },
