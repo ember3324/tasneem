@@ -157,12 +157,13 @@ export function MoyasarCardForm({
         // else just sees the card form.
         methods: ['applepay', 'creditcard'],
         supported_networks: ['visa', 'mastercard', 'mada'],
-        // No validate_merchant_url here on purpose: moyasar.js knows its own
-        // validation endpoint, and hard-coding it meant a change on their side
-        // would silently send merchant validation to the wrong place.
+        // moyasar.js has no default for this: leaving it out makes the form
+        // refuse to render at all with "Validate Merchat URL is required for
+        // Apple Pay", which also hides the card form. It must stay.
         apple_pay: {
           country: 'SA',
           label: 'نبع مكيون',
+          validate_merchant_url: 'https://api.moyasar.com/v1/applepay/initiate',
         },
         metadata: { order_number: orderNumber },
         on_completed: async function (payment: { id: string }) {
