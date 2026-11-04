@@ -1,16 +1,25 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 const MOYASAR_JS_URL = 'https://cdn.moyasar.com/mpf/1.15.0/moyasar.js'
 const MOYASAR_CSS_URL = 'https://cdn.moyasar.com/mpf/1.15.0/moyasar.css'
 
-// See src/lib/moyasar.ts for the overall payment flow and why the
-// /api/payments/link call right after on_completed matters.
+// Temporary Apple Pay diagnostics. Apple Pay only runs in Safari on an Apple
+// device, and when merchant validation fails the sheet closes with no error
+// anywhere — not in the page, not in the Moyasar dashboard. These hooks print
+// the real reason on screen so it can be read off the phone directly.
+// Remove this block (and the banner below) once Apple Pay works.
+const APPLE_PAY_DEBUG = true
+
 declare global {
   interface Window {
     Moyasar?: {
       init: (options: Record<string, unknown>) => void
+    }
+    ApplePaySession?: {
+      canMakePayments: () => boolean
+      supportsVersion: (v: number) => boolean
     }
   }
 }
@@ -25,6 +34,83 @@ export function MoyasarCardForm({
   publishableKey: string
 }) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const [diag, setDiag] = useState<string[]>([])
+
+  useEffect(() => {
+    if (!APPLE_PAY_DEBUG) return
+    const add = (line: string) =>
+      setDiag((prev) => (prev.includes(line) ? prev : [...prev, line]))
+
+    let host = '-'
+    try {
+      host = window.location.host
+    } catch {}
+    const ap = window.ApplePaySession
+    add(
+      `host=${host} · ApplePaySession=${ap ? 'yes' : 'no'}` +
+        (ap ? ` · canMakePayments=${(() => { try { return String(ap.canMakePayments()) } catch (e) { return 'threw:' + String(e) } })()}` : ''),
+    )
+
+    const isValidate = (url: string) => /applepay|apple_pay|initiate/i.test(url)
+
+    // --- fetch
+    const realFetch = window.fetch
+    window.fetch = async function (...args: Parameters<typeof fetch>) {
+      const url = typeof args[0] === 'string' ? args[0] : String((args[0] as Request)?.url ?? '')
+      try {
+        const res = await realFetch.apply(this, args)
+        if (isValidate(url) && !res.ok) {
+          const body = await res.clone().text()
+          add(`validate ${res.status}: ${body.slice(0, 300)}`)
+        }
+        return res
+      } catch (e) {
+        if (isValidate(url)) add(`validate network error: ${String(e)}`)
+        throw e
+      }
+    } as typeof window.fetch
+
+    // --- XMLHttpRequest (older mpf builds use this)
+    const realOpen = XMLHttpRequest.prototype.open
+    const realSend = XMLHttpRequest.prototype.send
+    XMLHttpRequest.prototype.open = function (
+      this: XMLHttpRequest & { __url?: string },
+      method: string,
+      url: string | URL,
+      ...rest: unknown[]
+    ) {
+      this.__url = String(url)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return (realOpen as any).call(this, method, url, ...rest)
+    } as typeof XMLHttpRequest.prototype.open
+    XMLHttpRequest.prototype.send = function (
+      this: XMLHttpRequest & { __url?: string },
+      ...rest: unknown[]
+    ) {
+      const u = this.__url || ''
+      if (isValidate(u)) {
+        this.addEventListener('load', () => {
+          if (this.status >= 400) add(`validate ${this.status}: ${String(this.responseText).slice(0, 300)}`)
+        })
+        this.addEventListener('error', () => add(`validate network error on ${u}`))
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return (realSend as any).apply(this, rest)
+    } as typeof XMLHttpRequest.prototype.send
+
+    const onErr = (e: ErrorEvent) => add(`js error: ${e.message}`)
+    const onRej = (e: PromiseRejectionEvent) => add(`rejected: ${String(e.reason).slice(0, 300)}`)
+    window.addEventListener('error', onErr)
+    window.addEventListener('unhandledrejection', onRej)
+
+    return () => {
+      window.fetch = realFetch
+      XMLHttpRequest.prototype.open = realOpen
+      XMLHttpRequest.prototype.send = realSend
+      window.removeEventListener('error', onErr)
+      window.removeEventListener('unhandledrejection', onRej)
+    }
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -71,10 +157,12 @@ export function MoyasarCardForm({
         // else just sees the card form.
         methods: ['applepay', 'creditcard'],
         supported_networks: ['visa', 'mastercard', 'mada'],
+        // No validate_merchant_url here on purpose: moyasar.js knows its own
+        // validation endpoint, and hard-coding it meant a change on their side
+        // would silently send merchant validation to the wrong place.
         apple_pay: {
           country: 'SA',
           label: 'نبع مكيون',
-          validate_merchant_url: 'https://api.moyasar.com/v1/applepay/initiate',
         },
         metadata: { order_number: orderNumber },
         on_completed: async function (payment: { id: string }) {
@@ -104,5 +192,17 @@ export function MoyasarCardForm({
     }
   }, [orderNumber, amountSar, publishableKey])
 
-  return <div ref={containerRef} className="mysr-form" />
+  return (
+    <>
+      <div ref={containerRef} className="mysr-form" />
+      {APPLE_PAY_DEBUG && diag.length > 0 && (
+        <pre
+          dir="ltr"
+          className="mt-4 max-h-60 overflow-auto rounded-lg bg-neutral-100 p-3 text-[11px] leading-relaxed whitespace-pre-wrap text-neutral-700"
+        >
+          {diag.join('\n')}
+        </pre>
+      )}
+    </>
+  )
 }
